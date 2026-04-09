@@ -24,6 +24,13 @@ This file tracks the exact things that tripped you up — which is what intervie
 <!-- AI: add entries below after each session -->
 
 ## 2026-04-09
+**Topic:** React Native — FlatList vs ScrollView
+**What happened:** Said FlatList is "more complex and heavy" — correct direction but missed the key reason: virtualization.
+**Root cause:** Knows the components exist but not the performance mechanism behind them.
+**Fix / key insight:** ScrollView renders ALL children at once. FlatList only renders visible items — unmounts others. For any list that can grow, always use FlatList.
+**Revisit:** my-stack/react-native.md
+
+## 2026-04-09
 **Topic:** Microservices — when NOT to use them
 **What happened:** Got the benefits right but completely ignored the second half of the question — when not to split.
 **Root cause:** Knows the sales pitch for microservices, not the tradeoffs. Missing: network failure, distributed transactions, operational overhead, team size requirement.
