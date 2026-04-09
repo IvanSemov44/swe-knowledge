@@ -24,6 +24,13 @@ This file tracks the exact things that tripped you up — which is what intervie
 <!-- AI: add entries below after each session -->
 
 ## 2026-04-09
+**Topic:** Microservices — when NOT to use them
+**What happened:** Got the benefits right but completely ignored the second half of the question — when not to split.
+**Root cause:** Knows the sales pitch for microservices, not the tradeoffs. Missing: network failure, distributed transactions, operational overhead, team size requirement.
+**Fix / key insight:** Microservices solve org/scale problems, not code problems. Start monolith, extract when you feel pain. Small team + microservices = overhead with no benefit.
+**Revisit:** senior/microservices.md
+
+## 2026-04-09
 **Topic:** DSA — Two pointers
 **What happened:** Only knew brute force O(n²). Correctly identified why two pointers needs sorted array after being taught.
 **Root cause:** Never studied optimal patterns — jumped straight to nested loop thinking.
