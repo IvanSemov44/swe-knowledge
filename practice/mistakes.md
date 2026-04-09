@@ -24,6 +24,13 @@ This file tracks the exact things that tripped you up — which is what intervie
 <!-- AI: add entries below after each session -->
 
 ## 2026-04-09
+**Topic:** CI/CD pipeline order
+**What happened:** Listed lint, tests, deploy, restart — right instincts but wrong order and missing build + Docker steps. Confused pre-commit hooks with CI steps.
+**Root cause:** Knows pieces of the pipeline but not the full sequence or why the order matters.
+**Fix / key insight:** Order is lint → type check → tests → build → docker build/push → deploy. Cheapest first, fail fast. Docker image tagged with commit SHA for traceability. CI runs lint too even if pre-commit hook exists — because hooks can be skipped.
+**Revisit:** senior/ci-cd.md
+
+## 2026-04-09
 **Topic:** React — re-renders and React.memo
 **What happened:** Named useCallback/useMemo but didn't answer "which children re-render." Didn't know when NOT to use React.memo.
 **Root cause:** Knows the hooks exist but not the mental model: all children re-render by default, memo + useCallback work as a pair.
