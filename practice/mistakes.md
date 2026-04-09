@@ -24,6 +24,13 @@ This file tracks the exact things that tripped you up — which is what intervie
 <!-- AI: add entries below after each session -->
 
 ## 2026-04-09
+**Topic:** React — re-renders and React.memo
+**What happened:** Named useCallback/useMemo but didn't answer "which children re-render." Didn't know when NOT to use React.memo.
+**Root cause:** Knows the hooks exist but not the mental model: all children re-render by default, memo + useCallback work as a pair.
+**Fix / key insight:** React.memo skips render on shallow prop equality. useCallback stabilizes function props so memo's comparison works. Don't use memo for cheap components or when props always change.
+**Revisit:** mid/react-internals.md
+
+## 2026-04-09
 **Topic:** EF Core — N+1 problem
 **What happened:** Described the concept correctly but used pseudocode. Missed that in EF Core N+1 is invisible — it looks like normal property access, not an explicit query call.
 **Root cause:** Knows the pattern abstractly, hasn't seen it fail silently in real EF Core code.
