@@ -24,6 +24,13 @@ This file tracks the exact things that tripped you up — which is what intervie
 <!-- AI: add entries below after each session -->
 
 ## 2026-04-09
+**Topic:** DSA — Two pointers
+**What happened:** Only knew brute force O(n²). Correctly identified why two pointers needs sorted array after being taught.
+**Root cause:** Never studied optimal patterns — jumped straight to nested loop thinking.
+**Fix / key insight:** Sorted → two pointers O(n). Unsorted → hash set O(n). Sort-then-two-pointers is O(n log n) — valid but worse than hash set.
+**Revisit:** senior/advanced-algorithms.md
+
+## 2026-04-09
 **Topic:** CI/CD pipeline order
 **What happened:** Listed lint, tests, deploy, restart — right instincts but wrong order and missing build + Docker steps. Confused pre-commit hooks with CI steps.
 **Root cause:** Knows pieces of the pipeline but not the full sequence or why the order matters.
