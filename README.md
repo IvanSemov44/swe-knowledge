@@ -41,6 +41,7 @@ knowledge-repo/
     ddd.md
     cqrs.md
     react-internals.md
+    react-patterns.md
     rtk-query.md
     docker.md
     testing.md
@@ -64,6 +65,8 @@ knowledge-repo/
     typescript-js.md
     aspnet.md
     react.md
+    redux-toolkit.md
+    zustand.md
     react-native.md
 ```
 
