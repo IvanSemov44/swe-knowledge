@@ -142,6 +142,30 @@ Update this file after every study session. Be honest.
 - `[b]` Polling
 - `[~]` Streaming / subscriptions
 
+### Redux Toolkit
+- `[b]` Slices (actions, reducers, Immer)
+- `[ ]` Typed hooks (useAppSelector, useAppDispatch)
+- `[~]` createSelector / memoized selectors
+- `[b]` createAsyncThunk + extraReducers
+- `[ ]` Redux DevTools
+- `[b]` Redux vs RTK Query — what goes where
+
+### Zustand
+- `[ ]` create() — basic store with state + actions
+- `[ ]` Selecting specific state (avoiding full store subscription)
+- `[ ]` useShallow for multiple fields
+- `[ ]` Async actions
+- `[ ]` persist middleware
+- `[ ]` Zustand vs Redux Toolkit — when to choose which
+
+### React Patterns
+- `[ ]` Error Boundaries — when to use, what they don't catch
+- `[ ]` HOC — implement one, explain tradeoffs
+- `[ ]` Render Props — recognize and implement the pattern
+- `[ ]` Compound Components — Context-based sub-component API
+- `[ ]` Portals — when and how to use
+- `[ ]` Custom hooks as the modern replacement for HOC/render props
+
 ### Docker
 - `[b]` Dockerfile basics
 - `[b]` docker-compose
