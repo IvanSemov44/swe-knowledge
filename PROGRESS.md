@@ -143,12 +143,12 @@ Update this file after every study session. Be honest.
 - `[~]` Streaming / subscriptions
 
 ### Redux Toolkit
-- `[ ]` Slices (actions, reducers, Immer)
+- `[b]` Slices (actions, reducers, Immer)
 - `[ ]` Typed hooks (useAppSelector, useAppDispatch)
-- `[ ]` createSelector / memoized selectors
-- `[ ]` createAsyncThunk + extraReducers
+- `[~]` createSelector / memoized selectors
+- `[b]` createAsyncThunk + extraReducers
 - `[ ]` Redux DevTools
-- `[ ]` Redux vs RTK Query — what goes where
+- `[b]` Redux vs RTK Query — what goes where
 
 ### Zustand
 - `[ ]` create() — basic store with state + actions
