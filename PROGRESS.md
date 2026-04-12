@@ -104,16 +104,18 @@ Update this file after every study session. Be honest.
 - `[~]` Query performance, includes vs projections
 - `[b]` Owned entities / ComplexProperty (Value Objects)
 - `[b]` Value Converters
-- `[b]` Interceptors (SaveChangesInterceptor)
-- `[b]` Bulk operations (ExecuteUpdateAsync / ExecuteDeleteAsync)
+- `[~]` Interceptors (SaveChangesInterceptor)
+- `[c]` Bulk operations (ExecuteUpdateAsync / ExecuteDeleteAsync)
 - `[b]` Change Tracker states
 - `[b]` JSON Columns
 - `[b]` DbContext Pooling
 - `[b]` Optimistic Concurrency (RowVersion)
-- `[b]` Multi-tenancy (Global Query Filters)
+- `[b]` Multi-tenancy (Global Query Filters) — gap: IgnoreQueryFilters()
 - `[b]` Testcontainers (real DB integration tests)
 - `[b]` Background Workers (IHostedService)
 - `[b]` Dispatching Domain Events in SaveChangesAsync
+- `[~]` Interceptor vs SaveChangesAsync override — when to choose which
+- `[b]` Backing field EF Core wiring (SetField configuration)
 - `[ ]` Vector Search (EF Core 10)
 
 ### Clean Architecture
