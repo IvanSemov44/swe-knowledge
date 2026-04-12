@@ -102,8 +102,19 @@ Update this file after every study session. Be honest.
 - `[b]` Relationships (1:1, 1:N, M:N)
 - `[b]` AsNoTracking
 - `[~]` Query performance, includes vs projections
-- `[~]` Owned entities, value converters
-- `[ ]` Interceptors
+- `[b]` Owned entities / ComplexProperty (Value Objects)
+- `[b]` Value Converters
+- `[b]` Interceptors (SaveChangesInterceptor)
+- `[b]` Bulk operations (ExecuteUpdateAsync / ExecuteDeleteAsync)
+- `[b]` Change Tracker states
+- `[b]` JSON Columns
+- `[b]` DbContext Pooling
+- `[b]` Optimistic Concurrency (RowVersion)
+- `[b]` Multi-tenancy (Global Query Filters)
+- `[b]` Testcontainers (real DB integration tests)
+- `[b]` Background Workers (IHostedService)
+- `[b]` Dispatching Domain Events in SaveChangesAsync
+- `[ ]` Vector Search (EF Core 10)
 
 ### Clean Architecture
 - `[c]` Layer responsibilities
@@ -119,6 +130,9 @@ Update this file after every study session. Be honest.
 - `[b]` Unit of Work
 - `[~]` Bounded contexts
 - `[~]` Ubiquitous language
+- `[b]` Rich vs Anemic domain model
+- `[b]` Backing fields (IReadOnlyCollection)
+- `[b]` Domain Events vs Integration Events
 
 ### CQRS + MediatR
 - `[b]` Command vs Query separation

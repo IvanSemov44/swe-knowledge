@@ -194,6 +194,92 @@ public interface IOrderRepository
 
 ---
 
+### Rich Domain Model vs Anemic Domain Model
+
+**Anemic** — entities are just data bags, all logic lives in services. This is the anti-pattern.
+
+```csharp
+// ANEMIC — entity has no behavior
+public class Order { public OrderStatus Status { get; set; } }
+
+// Logic leaks into the service
+public void ShipOrder(Order order) { order.Status = OrderStatus.Shipped; }
+```
+
+**Rich** — business logic lives on the entity. Services are thin.
+
+```csharp
+// RICH — entity owns its behavior
+public class Order
+{
+    public OrderStatus Status { get; private set; }
+
+    public Result Ship()
+    {
+        if (Status != OrderStatus.Paid)
+            return Result.Failure(ErrorCodes.InvalidOrderStatus);
+        Status = OrderStatus.Shipped;
+        AddDomainEvent(new OrderShippedEvent(Id));
+        return Result.Success();
+    }
+}
+
+// Handler is thin — fetch, call behavior, save
+public async Task Handle(ShipOrderCommand cmd, CancellationToken ct)
+{
+    var order = await _repo.GetByIdAsync(cmd.OrderId, ct);
+    order.Ship();
+    await _unitOfWork.SaveChangesAsync(ct);
+}
+```
+
+**Rule:** If you find yourself writing `order.Status = OrderStatus.Shipped` in a service, that logic belongs on `Order`.
+
+---
+
+### Backing Fields
+
+Prevent external code from bypassing domain logic on collections.
+
+```csharp
+public class Order
+{
+    private readonly List<OrderItem> _items = new(); // private — EF maps to this
+    public IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly(); // public read
+
+    public void AddItem(OrderItem item) // only way to add
+    {
+        // enforce invariants here
+        _items.Add(item);
+    }
+}
+
+// EF Core configuration
+builder.Entity<Order>()
+    .HasMany(o => o.Items)
+    .WithOne()
+    .HasForeignKey("OrderId")
+    .Metadata.PrincipalToDependent!.SetField("_items"); // map EF to the backing field
+```
+
+---
+
+### Domain Events vs Integration Events
+
+This distinction separates DDD from microservices thinking — interviewers ask this often.
+
+| | Domain Events | Integration Events |
+|---|---|---|
+| **Scope** | Within the same application/process | Across separate services |
+| **Transport** | In-memory (MediatR) | Message broker (Kafka, RabbitMQ) |
+| **Timing** | Dispatched after `SaveChangesAsync` | Published after DB commit, consumed async |
+| **Example** | `OrderPlacedEvent` → send confirmation email | `OrderPlacedEvent` → Inventory Service decrements stock |
+| **Failure** | If handler throws, you handle in-process | Consumer retries independently |
+
+**Key insight:** DDD is a *software design* methodology (logical boundaries). Microservices is a *deployment architecture* (physical boundaries). You can use DDD in a monolith — most teams do.
+
+---
+
 ### Domain Services
 
 When a business operation involves multiple aggregates and doesn't naturally belong to any one entity, use a Domain Service.
