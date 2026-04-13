@@ -53,6 +53,9 @@ knowledge-repo/
     advanced-algorithms.md
     microservices.md
     ci-cd.md
+    observability.md
+    api-gateway.md
+    kubernetes.md
 
   ai-integration/
     llm-api-basics.md

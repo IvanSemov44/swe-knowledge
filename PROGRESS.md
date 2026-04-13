@@ -250,6 +250,31 @@ Update this file after every study session. Be honest.
 - `[ ]` Environment secrets management
 - `[ ]` Blue/green deployment
 
+### Observability
+- `[ ]` Structured logging with Serilog
+- `[ ]` Log levels — when to use each
+- `[ ]` Metrics — request rate, error rate, p99 latency
+- `[ ]` Distributed tracing — TraceId, spans
+- `[ ]` Health checks — /health/live vs /health/ready
+- `[ ]` Correlation ID pattern
+- `[ ]` OpenTelemetry setup in .NET
+
+### API Gateway
+- `[ ]` What an API Gateway does vs a Load Balancer
+- `[ ]` YARP setup — routes, clusters, destinations
+- `[ ]` JWT validation at gateway, forwarding user identity
+- `[ ]` Rate limiting at gateway level
+- `[ ]` YARP vs Ocelot — when to choose which
+
+### Kubernetes
+- `[ ]` Pod vs Deployment vs Service vs Ingress
+- `[ ]` liveness vs readiness probes
+- `[ ]` Stateless app requirements for K8s
+- `[ ]` ConfigMap and Secret for configuration
+- `[ ]` Rolling updates and rollbacks
+- `[ ]` Basic kubectl commands
+- `[ ]` Docker Compose for local dev vs K8s for production
+
 ---
 
 ## AI INTEGRATION
