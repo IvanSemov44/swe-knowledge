@@ -136,12 +136,39 @@ Update this file after every study session. Be honest.
 - `[b]` Backing fields (IReadOnlyCollection)
 - `[b]` Domain Events vs Integration Events
 
+### Shared Kernel
+- `[ ]` Entity vs AggregateRoot base class implementation
+- `[ ]` ValueObject equality implementation
+- `[ ]` IDomainEvent vs IIntegrationEvent — what each is for
+- `[ ]` Result<T> pattern — implement from scratch
+- `[ ]` IUnitOfWork — interface + implementation
+- `[ ]` ErrorCodes — structure and usage
+
+### Modular Monolith
+- `[ ]` Module structure — Domain/Application/Infrastructure/Tests per module
+- `[ ]` Separate DbContext per module with schema-per-module
+- `[ ]` Module registration in Program.cs (extension methods)
+- `[ ]` Public Module API pattern (ICatalogModule)
+- `[ ]` No cross-module EF navigation properties
+- `[ ]` Separate migrations per DbContext
+- `[ ]` When to use in-process call vs integration event
+
 ### CQRS + MediatR
 - `[b]` Command vs Query separation
 - `[b]` MediatR pipeline behaviors
 - `[b]` Validation pipeline behavior
 - `[~]` Event sourcing basics
 - `[ ]` Outbox pattern
+
+### Event-Driven Flow
+- `[ ]` Full event flow — domain event → outbox → RabbitMQ → consumer → inbox
+- `[ ]` Outbox pattern — manual implementation
+- `[ ]` MassTransit built-in Outbox setup
+- `[ ]` Inbox pattern — idempotent consumer
+- `[ ]` Dead Letter Queue — configuration and monitoring
+- `[ ]` MassTransit consumer setup
+- `[ ]` Saga basics — state machine for long-running workflows
+- `[ ]` RabbitMQ + Docker setup
 
 ### React Internals
 - `[c]` Components, props, state
