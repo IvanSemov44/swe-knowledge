@@ -201,12 +201,18 @@ Update this file after every study session. Be honest.
 ## SENIOR LEVEL
 
 ### System Design
-- `[ ]` URL shortener
-- `[ ]` Rate limiter
+- `[b]` URL shortener
+- `[b]` Rate limiter — token bucket, fixed window, sliding window
+- `[b]` Rate limiter — Redis as shared state, Lua atomicity
+- `[b]` API Gateway vs per-service middleware
+- `[b]` Horizontal vs vertical scaling
+- `[b]` Stateless design requirement for horizontal scaling
+- `[b]` Load balancer role and placement
 - `[ ]` News feed / timeline
 - `[ ]` Notification system
 - `[ ]` File storage system
 - `[ ]` Chat system
+- `[ ]` CAP theorem (read, not tested)
 
 ### Caching
 - `[~]` Cache-aside pattern
