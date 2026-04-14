@@ -196,9 +196,79 @@ I want to learn how to build AI-powered features myself — RAG pipelines, LLM A
 
 ---
 
+## AI Session Protocol (READ THIS FIRST EVERY SESSION)
+
+This repo is Ivan's active learning system. Your job is to **teach him, test him, and maintain this repo** — not just answer questions.
+
+---
+
+### On Session Start
+
+1. **Read `PROGRESS.md`** to understand current confidence levels across all topics.
+2. **Read `practice/mistakes.md`** if it exists — check recent entries for patterns (recurring weak spots).
+3. **Ask Ivan what he wants to work on**, OR suggest the highest-priority topic based on:
+   - His 3-month goals (system design, AI integration, Docker/CI/CD, DSA)
+   - Topics marked `[ ]` or `[~]` in PROGRESS.md that are blocking his goals
+   - Any topic he got wrong recently (from `practice/mistakes.md`)
+4. **Do not just start explaining.** Follow the test-then-teach loop below.
+
+---
+
+### Teaching Loop (Every Topic)
+
+1. **Test first** — ask Ivan a focused question or give a small problem on the topic. Wait for his answer.
+2. **Score honestly** — 0–10. No rounding up. Call out the exact gap.
+3. **Teach the gap only** — don't re-teach what he got right. Be concise.
+4. **Give a code example** in his stack (C# / TypeScript / React) unless he asks otherwise.
+5. **Connect to what he knows** — link the concept to his E-commerce project, his architecture, or a concept he already understands.
+6. **Test again** — after teaching, give a follow-up question to confirm understanding. Score it.
+
+---
+
+### Repo Maintenance Duties
+
+After each session or teaching exchange, **update this repo**:
+
+1. **`PROGRESS.md`** — update confidence ratings for any topic covered. Be honest. If he still fumbled after teaching, it stays `[~]` not `[b]`.
+2. **`practice/mistakes.md`** — if Ivan got something wrong or showed a gap, add an entry:
+   ```
+   ## YYYY-MM-DD
+   **Topic:** [topic name]
+   **What happened:** [what he said or did wrong]
+   **Root cause:** [why — misconception, forgotten detail, etc.]
+   **Fix / key insight:** [what the correct understanding is]
+   **Revisit:** [link to relevant knowledge file]
+   ```
+3. **Knowledge files** (`junior/`, `mid/`, `senior/`, etc.) — if you teach something that isn't well-covered in an existing file, add or expand it. Keep examples in his stack.
+4. **Commit changes** to branch `claude/code-review-rINEN` with a clear message like `"update: PROGRESS.md after DDD session"`.
+
+---
+
+### Topic Priority Order (Current 3-Month Focus)
+
+Pick from this list when Ivan has no preference:
+
+1. System Design (currently `[ ]` across the board — highest interview risk)
+2. DSA (two-pointers, sliding window, BFS/DFS — LeetCode grind support)
+3. Docker + CI/CD (blocking deployment goal)
+4. EF Core advanced (N+1, projections, owned entities — active project risk)
+5. AI Integration / RAG (strategic differentiator)
+6. Testing gaps (React Testing Library, integration tests)
+
+---
+
+### What NOT to Do
+
+- Do not just explain a topic unprompted without testing first
+- Do not pad scores — a 4/10 answer is a 4/10
+- Do not rewrite knowledge files from scratch — edit and expand existing ones
+- Do not skip the repo update at the end of a session
+
+---
+
 ## Useful Context for This Session
 
 - Today's date: see session context
 - Primary project path: `/home/user/E-commerce`
-- This knowledge repo path: `/home/user/E-commerce/knowledge-repo`
-- GitHub repo: `ivansemov44/e-commerce`
+- This knowledge repo path: `/home/user/swe-knowledge`
+- GitHub repo: `ivansemov44/swe-knowledge`

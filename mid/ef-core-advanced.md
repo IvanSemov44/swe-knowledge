@@ -1,58 +1,193 @@
 # EF Core Advanced
 
-## What it is
-Entity Framework Core is .NET's ORM. "Advanced" means going beyond basic CRUD — understanding the Change Tracker, performance patterns, and enterprise-grade features.
+<!-- last-reviewed: 2026-04-09 | next-review: 2026-05-09 | confidence: b -->
 
 ---
 
-## AsNoTracking — Read-Only Performance
+## N+1 Problem
 
-The Change Tracker monitors every loaded entity for mutations. On read-only queries it wastes CPU and memory.
+The most common EF Core performance bug. Happens when you access a navigation property inside a loop without eager loading — EF fires a separate SQL query per iteration.
 
 ```csharp
-// BAD for reads — tracks every entity unnecessarily
-var products = await _context.Products.ToListAsync();
+// BAD — 1 query for orders + N queries for OrderItems (one per order)
+var orders = await _context.Orders.ToListAsync();
+foreach (var order in orders)
+{
+    var count = order.OrderItems.Count; // EF lazy loads here — separate DB hit
+}
+```
 
-// GOOD for reads — no Change Tracker overhead
-var products = await _context.Products
-    .AsNoTracking()
+Called **N+1** because: 1 query for the list + N queries for related data = N+1 total.
+
+**Rule:** Any time you access a navigation property inside a loop — did you `.Include()` it?
+
+---
+
+## Eager Loading with .Include()
+
+Loads related entities upfront in a single JOIN query.
+
+```csharp
+var orders = await _context.Orders
+    .Include(o => o.OrderItems)
+    .ThenInclude(i => i.Product)   // nested include
     .ToListAsync();
 ```
 
-**Rule:** Any query that feeds a DTO/read model should use `.AsNoTracking()`.
+**Use when:** Command handlers — you need the full aggregate to mutate and save back.
+
+**Cost:** Loads entire entities (all columns) into memory, tracked by EF change tracker.
+
+---
+
+## Projections with .Select()
+
+Only fetches the columns you specify. Faster, less memory, no change tracking.
+
+```csharp
+var dtos = await _context.Orders
+    .Select(o => new OrderSummaryDto
+    {
+        Id = o.Id,
+        TotalItems = o.OrderItems.Count,
+        TotalPrice = o.OrderItems.Sum(i => i.Price)
+    })
+    .ToListAsync();
+```
+
+**Use when:** Query handlers — read-only, returning a DTO to the client.
+
+### Include vs Select — the rule
+
+| Scenario | Use |
+|---|---|
+| Command handler — need to mutate entity | `.Include()` |
+| Query handler — returning a DTO | `.Select()` |
+| Displaying a list | `.Select()` |
+| Loading an aggregate root | `.Include()` |
+
+Maps directly to CQRS: queries always project, commands always include.
+
+---
+
+## AsNoTracking
+
+By default, EF tracks every loaded entity in the change tracker (memory overhead, slower).
+For read-only queries, disable it.
+
+```csharp
+var orders = await _context.Orders
+    .AsNoTracking()
+    .Include(o => o.OrderItems)
+    .ToListAsync();
+```
+
+**Rule:** Any query that won't call `SaveChangesAsync` should use `.AsNoTracking()`.
+`.Select()` projections are automatically non-tracked (no entity = nothing to track).
+
+---
+
+## Owned Entities
+
+Value Objects in DDD are mapped as owned entities in EF — they have no separate table by default, stored in the owner's table.
+
+```csharp
+// Core — Value Object
+public class Address
+{
+    public string Street { get; }
+    public string City { get; }
+    // ...
+}
+
+// Core — Entity owns Address
+public class Order
+{
+    public Address ShippingAddress { get; private set; }
+}
+
+// Infrastructure — EF config
+builder.OwnsOne(o => o.ShippingAddress, a =>
+{
+    a.Property(x => x.Street).HasColumnName("ShippingStreet");
+    a.Property(x => x.City).HasColumnName("ShippingCity");
+});
+```
+
+---
+
+## Value Converters
+
+Map a domain type to a DB column type. Common use: storing enums as strings, Value Objects as single columns.
+
+```csharp
+builder.Property(o => o.Status)
+    .HasConversion(
+        v => v.ToString(),           // to DB
+        v => Enum.Parse<OrderStatus>(v)  // from DB
+    );
+```
+
+---
+
+## Query Filters (Global Filters)
+
+Applied automatically to every query for an entity. Good for soft deletes or multi-tenancy.
+
+```csharp
+// In DbContext OnModelCreating
+builder.HasQueryFilter(o => !o.IsDeleted);
+
+// To bypass the filter when needed
+_context.Orders.IgnoreQueryFilters().ToListAsync();
+```
+
+---
+
+## Interceptors
+
+Hook into EF pipeline — runs before/after queries, saves, connections. Use for audit logging, soft-delete automation.
+
+```csharp
+public class AuditInterceptor : SaveChangesInterceptor
+{
+    public override InterceptionResult<int> SavingChanges(
+        DbContextEventData eventData, InterceptionResult<int> result)
+    {
+        // stamp UpdatedAt on every modified entity
+        foreach (var entry in eventData.Context.ChangeTracker.Entries())
+        {
+            if (entry.State == EntityState.Modified)
+                entry.Property("UpdatedAt").CurrentValue = DateTime.UtcNow;
+        }
+        return base.SavingChanges(eventData, result);
+    }
+}
+```
 
 ---
 
 ## Bulk Operations (EF Core 7+)
 
-Old pattern: fetch entities → loop → mutate → SaveChanges = N+1 SQL statements.
-
-New pattern: single SQL statement, Change Tracker bypassed entirely.
+Single SQL statement, Change Tracker bypassed entirely.
 
 ```csharp
-// OLD — loads all records into memory, then updates one by one
-var products = await _context.Products.Where(p => p.CategoryId == id).ToListAsync();
-foreach (var p in products) p.IsActive = false;
-await _context.SaveChangesAsync();
-
-// NEW — single UPDATE statement, never loads entities
+// Single UPDATE — never loads entities into memory
 await _context.Products
     .Where(p => p.CategoryId == id)
     .ExecuteUpdateAsync(s => s.SetProperty(p => p.IsActive, false));
 
-// DELETE
+// Single DELETE
 await _context.Products
     .Where(p => p.IsActive == false)
     .ExecuteDeleteAsync();
 ```
 
-**When NOT to use:** when you need domain logic to run (domain events, interceptors, Change Tracker hooks). Bulk operations bypass all of that.
+**When NOT to use:** when domain events, interceptors, or business rules need to fire. Bulk ops skip all of that.
 
 ---
 
-## Change Tracker
-
-Monitors entity states so EF knows what SQL to generate on `SaveChanges`.
+## Change Tracker States
 
 | State | Meaning |
 |---|---|
@@ -62,144 +197,13 @@ Monitors entity states so EF knows what SQL to generate on `SaveChanges`.
 | `Unchanged` | Loaded but not changed, no SQL |
 | `Detached` | Not tracked at all |
 
-```csharp
-var entry = _context.Entry(order);
-Console.WriteLine(entry.State); // EntityState.Unchanged
-
-order.Ship();
-Console.WriteLine(entry.State); // EntityState.Modified
-```
-
 ---
 
-## Value Converters
+## ComplexProperty for Value Objects (EF Core 8+)
 
-Translate C# types ↔ database column types.
-
-```csharp
-// Store an enum as a string instead of int (more readable in DB)
-builder.Property(p => p.Status)
-    .HasConversion<string>();
-
-// Store a custom type as a string
-builder.Property(p => p.Color)
-    .HasConversion(
-        color => color.ToHex(),        // C# → DB
-        hex => Color.FromHex(hex)      // DB → C#
-    );
-```
-
----
-
-## Interceptors
-
-Hooks that run during EF Core operations. Don't modify entities in your code — let the interceptor handle cross-cutting concerns.
+Replaces `OwnsOne` — no shadow keys, more predictable.
 
 ```csharp
-public class AuditInterceptor : SaveChangesInterceptor
-{
-    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
-        DbContextEventData eventData,
-        InterceptionResult<int> result,
-        CancellationToken ct = default)
-    {
-        var entries = eventData.Context!.ChangeTracker.Entries<IAuditable>();
-        foreach (var entry in entries)
-        {
-            if (entry.State == EntityState.Added)
-                entry.Entity.CreatedAt = DateTime.UtcNow;
-            if (entry.State == EntityState.Modified)
-                entry.Entity.UpdatedAt = DateTime.UtcNow;
-        }
-        return base.SavingChangesAsync(eventData, result, ct);
-    }
-}
-
-// Register in Program.cs
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString)
-           .AddInterceptors(new AuditInterceptor()));
-```
-
----
-
-## JSON Columns (EF Core 7+)
-
-Store semi-structured data as JSON in a relational column. Avoids the Entity-Attribute-Value (EAV) anti-pattern.
-
-```csharp
-// Entity
-public class Product
-{
-    public Guid Id { get; set; }
-    public Dictionary<string, string> Attributes { get; set; } = new(); // stored as JSON
-}
-
-// Configuration
-builder.Property(p => p.Attributes).HasColumnType("nvarchar(max)");
-
-// Or map a full owned type as JSON
-builder.OwnsOne(p => p.Metadata, metadata =>
-{
-    metadata.ToJson(); // entire object stored as JSON column
-});
-```
-
-**Use when:** data is dynamic/optional per product type (e.g., electronics have Wattage, clothing has Size). Avoids 50 nullable columns or EAV tables.
-
----
-
-## Vector Search (EF Core 10 + pgvector / SQL Server)
-
-Enables semantic (meaning-based) search inside the database — no separate vector store needed for simpler use cases.
-
-```csharp
-public class Product
-{
-    public Guid Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public Vector? NameEmbedding { get; set; } // stored as vector column
-}
-
-// Semantic similarity search
-var embedding = await _embeddingService.GetEmbeddingAsync(searchTerm);
-var results = await _context.Products
-    .OrderBy(p => EF.Functions.VectorDistance("cosine", p.NameEmbedding, embedding))
-    .Take(10)
-    .ToListAsync();
-```
-
-**Use when:** building search features, RAG pipelines, or recommendation systems where exact text match is insufficient.
-
----
-
-## LINQ Joins (EF Core 10)
-
-```csharp
-// Before EF10 — verbose SelectMany pattern
-var result = context.Orders
-    .GroupJoin(context.Users,
-        o => o.UserId, u => u.Id,
-        (o, users) => new { Order = o, Users = users })
-    .SelectMany(x => x.Users.DefaultIfEmpty(),
-        (x, u) => new { x.Order, User = u });
-
-// EF Core 10 — native left join
-var result = context.Orders
-    .LeftJoin(context.Users,
-        o => o.UserId,
-        u => u.Id,
-        (o, u) => new { Order = o, User = u });
-```
-
----
-
-## Value Objects as ComplexProperty (EF Core 8+)
-
-Replaces the older `OwnsOne` / Owned Types pattern for Value Objects. More predictable, no shadow keys.
-
-```csharp
-// Configuration
 builder.ComplexProperty(o => o.ShippingAddress, address =>
 {
     address.Property(a => a.Street).HasMaxLength(200);
@@ -207,23 +211,18 @@ builder.ComplexProperty(o => o.ShippingAddress, address =>
 });
 ```
 
-Columns are stored inline in the parent table (same row). No separate table, no foreign key.
-
 ---
 
 ## DbContext Pooling
 
-Reuses `DbContext` instances instead of creating a new one per request. Major throughput improvement under load.
+Reuses `DbContext` instances instead of creating a new one per request.
 
 ```csharp
-// BAD for high traffic
-builder.Services.AddDbContext<AppDbContext>(...);
-
-// GOOD for high traffic
+// High traffic — use pooling
 builder.Services.AddDbContextPool<AppDbContext>(..., poolSize: 1024);
 ```
 
-**Caveat:** don't store request-specific state on the DbContext (e.g., current user). Use scoped services instead.
+**Caveat:** don't store request-specific state on the DbContext when using pooling.
 
 ---
 
@@ -234,72 +233,42 @@ Prevents lost updates when two users edit the same record simultaneously.
 ```csharp
 public class Product
 {
-    public Guid Id { get; set; }
     [Timestamp]
-    public byte[] RowVersion { get; set; } = []; // EF checks this on UPDATE
+    public byte[] RowVersion { get; set; } = [];
 }
-```
 
-If User A and User B both load the same product, and User A saves first, User B's save throws `DbUpdateConcurrencyException` because the `RowVersion` no longer matches.
-
-```csharp
 try
 {
     await _context.SaveChangesAsync();
 }
 catch (DbUpdateConcurrencyException)
 {
-    // Reload and retry, or return conflict error to client
     return Result.Failure(ErrorCodes.ConcurrencyConflict);
 }
 ```
 
 ---
 
-## Multi-Tenancy (Global Query Filters)
-
-For SaaS apps where all tenants share the same database tables. Global Query Filters ensure every query automatically adds a `WHERE TenantId = @current`.
-
-```csharp
-public class AppDbContext : DbContext
-{
-    private readonly ITenantProvider _tenantProvider;
-
-    protected override void OnModelCreating(ModelBuilder builder)
-    {
-        // Automatically appended to every query on this entity
-        builder.Entity<Product>()
-            .HasQueryFilter(p => p.TenantId == _tenantProvider.CurrentTenantId);
-    }
-}
-```
-
-Pair with an interceptor that stamps `TenantId` on `Added` entities automatically.
-
----
-
 ## Testcontainers (Modern Integration Testing)
 
-`UseInMemoryDatabase` doesn't support real SQL features (transactions, indexes, constraints). Use Testcontainers to spin up a real SQL Server in Docker during tests.
+`UseInMemoryDatabase` doesn't support real SQL features. Use Testcontainers for a real SQL Server in Docker.
 
 ```csharp
-public class OrderIntegrationTests : IAsyncLifetime
+public class OrderTests : IAsyncLifetime
 {
-    private readonly MsSqlContainer _sqlContainer = new MsSqlBuilder().Build();
+    private readonly MsSqlContainer _sql = new MsSqlBuilder().Build();
 
-    public async Task InitializeAsync() => await _sqlContainer.StartAsync();
-    public async Task DisposeAsync() => await _sqlContainer.DisposeAsync();
+    public async Task InitializeAsync() => await _sql.StartAsync();
+    public async Task DisposeAsync() => await _sql.DisposeAsync();
 
     [Fact]
-    public async Task CreateOrder_ShouldPersist()
+    public async Task ShouldPersistOrder()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseSqlServer(_sqlContainer.GetConnectionString())
-            .Options;
-
-        await using var context = new AppDbContext(options);
-        await context.Database.MigrateAsync();
-        // ... test against real SQL Server
+            .UseSqlServer(_sql.GetConnectionString()).Options;
+        await using var ctx = new AppDbContext(options);
+        await ctx.Database.MigrateAsync();
+        // real SQL tests here
     }
 }
 ```
@@ -308,51 +277,41 @@ public class OrderIntegrationTests : IAsyncLifetime
 
 ## Background Workers (IHostedService)
 
-For long-running non-HTTP tasks: processing queues, sending emails, running scheduled jobs.
+For long-running non-HTTP tasks.
 
 ```csharp
-public class OrderProcessingWorker : BackgroundService
+public class OutboxWorker : BackgroundService
 {
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken ct)
     {
-        while (!stoppingToken.IsCancellationRequested)
+        while (!ct.IsCancellationRequested)
         {
-            // Process queued orders
-            await ProcessPendingOrdersAsync();
-            await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+            await ProcessOutboxAsync(ct);
+            await Task.Delay(TimeSpan.FromSeconds(5), ct);
         }
     }
 }
 
-// Register
-builder.Services.AddHostedService<OrderProcessingWorker>();
+builder.Services.AddHostedService<OutboxWorker>();
 ```
 
 ---
 
-## Unit of Work — Dispatching Domain Events
-
-Override `SaveChangesAsync` to dispatch domain events before or after committing.
+## Dispatching Domain Events in SaveChangesAsync
 
 ```csharp
-public class AppDbContext : DbContext
+public override async Task<int> SaveChangesAsync(CancellationToken ct = default)
 {
-    private readonly IMediator _mediator;
+    var events = ChangeTracker.Entries<AggregateRoot>()
+        .SelectMany(e => e.Entity.DomainEvents)
+        .ToList();
 
-    public override async Task<int> SaveChangesAsync(CancellationToken ct = default)
-    {
-        // Collect domain events from all tracked aggregates
-        var events = ChangeTracker.Entries<IHasDomainEvents>()
-            .SelectMany(e => e.Entity.DomainEvents)
-            .ToList();
+    var result = await base.SaveChangesAsync(ct);
 
-        var result = await base.SaveChangesAsync(ct); // commit first
+    foreach (var domainEvent in events)
+        await _mediator.Publish(domainEvent, ct);
 
-        foreach (var domainEvent in events)
-            await _mediator.Publish(domainEvent, ct); // then dispatch
-
-        return result;
-    }
+    return result;
 }
 ```
 
@@ -360,54 +319,56 @@ public class AppDbContext : DbContext
 
 ## Common Interview Questions
 
-1. What is the Change Tracker and when would you disable it?
-2. What is the difference between `ExecuteUpdateAsync` and loading + mutating entities?
-3. When would you use bulk operations vs normal EF update?
-4. What is an Interceptor? Give a real use case.
-5. What is optimistic concurrency and how does EF Core implement it?
-6. Why is `UseInMemoryDatabase` bad for integration tests?
-7. What is a Global Query Filter and when would you use it?
-8. What is DbContext Pooling and what's the trade-off?
+1. What is the N+1 problem and how do you fix it?
+2. When would you use `.Include()` vs `.Select()`?
+3. What is the Change Tracker and when would you disable it?
+4. What is the difference between `ExecuteUpdateAsync` and loading + mutating entities?
+5. What is an Interceptor? Give a real use case.
+6. What is optimistic concurrency and how does EF Core implement it?
+7. Why is `UseInMemoryDatabase` bad for integration tests?
+8. What is a Global Query Filter and when would you use it?
 
 ---
 
 ## Common Mistakes
 
-- Using `AddDbContext` instead of `AddDbContextPool` in high-traffic APIs
+- Accessing navigation properties in a loop without `.Include()` (N+1)
 - Forgetting `.AsNoTracking()` on read-only queries
-- Using `UseInMemoryDatabase` for integration tests (doesn't test real SQL)
-- Storing request state (current user, tenant) directly on the DbContext when using pooling
+- Using `UseInMemoryDatabase` for integration tests
 - Using bulk operations when domain events or interceptors need to fire
 - Not handling `DbUpdateConcurrencyException` when using `[Timestamp]`
+- Using `AddDbContext` instead of `AddDbContextPool` in high-traffic APIs
 
 ---
 
 ## How It Connects
 
+- N+1 → always `.Include()` in command handlers, `.Select()` in query handlers (CQRS)
 - Change Tracker + `SaveChangesAsync` override = where Domain Events get dispatched
-- Interceptors handle cross-cutting concerns (audit, tenant stamping) so entities stay clean
-- Value Objects map as `ComplexProperty` — no separate table, no shadow keys
+- Interceptors handle cross-cutting concerns (audit, tenant stamping)
 - Testcontainers + real SQL = tests that actually catch query bugs
 - Global Query Filters + ITenantProvider = multi-tenancy without polluting every query
-- Bulk operations bypass domain logic — only use for admin/data scripts, not business operations
+- Bulk operations bypass domain logic — only use for admin/data scripts
 
 ---
 
 ## My Confidence Level
-- `[ ]` AsNoTracking — when and why
-- `[ ]` Bulk operations (ExecuteUpdateAsync / ExecuteDeleteAsync)
-- `[ ]` Change Tracker states
-- `[ ]` Value Converters
-- `[ ]` Interceptors (SaveChangesInterceptor)
-- `[ ]` JSON Columns
-- `[ ]` Vector Search
-- `[ ]` ComplexProperty for Value Objects
-- `[ ]` DbContext Pooling
-- `[ ]` Optimistic Concurrency
-- `[ ]` Multi-tenancy (Global Query Filters)
-- `[ ]` Testcontainers
-- `[ ]` Background Workers (IHostedService)
-- `[ ]` Dispatching Domain Events in SaveChangesAsync
+- `[b]` N+1 problem and .Include() fix
+- `[b]` Eager loading vs projections — when to use each
+- `[b]` AsNoTracking — when and why
+- `[b]` Owned entities / ComplexProperty (Value Objects)
+- `[b]` Value Converters
+- `[c]` Bulk operations (ExecuteUpdateAsync / ExecuteDeleteAsync)
+- `[b]` Change Tracker states
+- `[~]` Interceptors vs SaveChangesAsync override — when to choose
+- `[b]` Global Query Filters — gap: IgnoreQueryFilters()
+- `[b]` DbContext Pooling
+- `[b]` Optimistic Concurrency (RowVersion)
+- `[b]` Testcontainers
+- `[b]` Background Workers (IHostedService)
+- `[b]` Dispatching Domain Events in SaveChangesAsync
+- `[ ]` Vector Search (EF Core 10)
+- `[ ]` Compiled queries / Raw SQL / Connection resiliency
 
 ## My Notes
 <!-- Personal notes -->
