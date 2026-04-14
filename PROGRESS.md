@@ -101,8 +101,8 @@ Update this file after every study session. Be honest.
 - `[b]` Migrations
 - `[b]` Relationships (1:1, 1:N, M:N)
 - `[b]` AsNoTracking
-- `[~]` Query performance, includes vs projections
-- `[~]` Owned entities, value converters
+- `[b]` Query performance, includes vs projections
+- `[b]` Owned entities, value converters
 - `[ ]` Interceptors
 
 ### Clean Architecture
@@ -133,7 +133,7 @@ Update this file after every study session. Be honest.
 - `[b]` Reconciliation algorithm
 - `[b]` Virtual DOM
 - `[b]` Rendering optimization (React.memo)
-- `[~]` Concurrent features (Suspense, transitions)
+- `[b]` Concurrent features (Suspense, transitions)
 
 ### RTK Query
 - `[c]` injectEndpoints, baseApi
@@ -170,7 +170,7 @@ Update this file after every study session. Be honest.
 - `[b]` Dockerfile basics
 - `[b]` docker-compose
 - `[~]` Multi-stage builds
-- `[ ]` Networking, volumes
+- `[b]` Networking, volumes (named volumes, service name = hostname)
 - `[ ]` Container registries
 
 ### Testing
@@ -223,10 +223,10 @@ Update this file after every study session. Be honest.
 
 ### CI/CD
 - `[b]` GitHub Actions basics
-- `[~]` Build, test, deploy pipeline
-- `[ ]` Docker build in CI
-- `[ ]` Environment secrets management
-- `[ ]` Blue/green deployment
+- `[b]` Build, test, deploy pipeline (order: lint → type check → test → build → docker → deploy)
+- `[b]` Docker build in CI
+- `[b]` Environment secrets management
+- `[b]` Blue/green deployment
 
 ---
 
