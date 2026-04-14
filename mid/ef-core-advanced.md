@@ -167,17 +167,208 @@ public class AuditInterceptor : SaveChangesInterceptor
 
 ---
 
-## Gaps to Fill Next
+## Bulk Operations (EF Core 7+)
 
-- [ ] Compiled queries (for hot paths)
-- [ ] Raw SQL with `FromSqlRaw` and when to use it
-- [ ] Connection resiliency (EnableRetryOnFailure)
-- [ ] Bulk operations (EF Core 8 ExecuteUpdate / ExecuteDelete)
+Single SQL statement, Change Tracker bypassed entirely.
+
+```csharp
+// Single UPDATE — never loads entities into memory
+await _context.Products
+    .Where(p => p.CategoryId == id)
+    .ExecuteUpdateAsync(s => s.SetProperty(p => p.IsActive, false));
+
+// Single DELETE
+await _context.Products
+    .Where(p => p.IsActive == false)
+    .ExecuteDeleteAsync();
+```
+
+**When NOT to use:** when domain events, interceptors, or business rules need to fire. Bulk ops skip all of that.
 
 ---
 
-## Connected To
+## Change Tracker States
 
-- `mid/ddd.md` — Owned entities map Value Objects; Aggregate roots map to repositories
-- `mid/cqrs.md` — Query handlers use `.Select()` + `.AsNoTracking()`; Command handlers use `.Include()`
-- `junior/sql-basics.md` — N+1 is a SQL problem, not just an EF problem
+| State | Meaning |
+|---|---|
+| `Added` | New entity, will INSERT |
+| `Modified` | Existing entity with changes, will UPDATE |
+| `Deleted` | Marked for removal, will DELETE |
+| `Unchanged` | Loaded but not changed, no SQL |
+| `Detached` | Not tracked at all |
+
+---
+
+## ComplexProperty for Value Objects (EF Core 8+)
+
+Replaces `OwnsOne` — no shadow keys, more predictable.
+
+```csharp
+builder.ComplexProperty(o => o.ShippingAddress, address =>
+{
+    address.Property(a => a.Street).HasMaxLength(200);
+    address.Property(a => a.City).HasMaxLength(100);
+});
+```
+
+---
+
+## DbContext Pooling
+
+Reuses `DbContext` instances instead of creating a new one per request.
+
+```csharp
+// High traffic — use pooling
+builder.Services.AddDbContextPool<AppDbContext>(..., poolSize: 1024);
+```
+
+**Caveat:** don't store request-specific state on the DbContext when using pooling.
+
+---
+
+## Optimistic Concurrency
+
+Prevents lost updates when two users edit the same record simultaneously.
+
+```csharp
+public class Product
+{
+    [Timestamp]
+    public byte[] RowVersion { get; set; } = [];
+}
+
+try
+{
+    await _context.SaveChangesAsync();
+}
+catch (DbUpdateConcurrencyException)
+{
+    return Result.Failure(ErrorCodes.ConcurrencyConflict);
+}
+```
+
+---
+
+## Testcontainers (Modern Integration Testing)
+
+`UseInMemoryDatabase` doesn't support real SQL features. Use Testcontainers for a real SQL Server in Docker.
+
+```csharp
+public class OrderTests : IAsyncLifetime
+{
+    private readonly MsSqlContainer _sql = new MsSqlBuilder().Build();
+
+    public async Task InitializeAsync() => await _sql.StartAsync();
+    public async Task DisposeAsync() => await _sql.DisposeAsync();
+
+    [Fact]
+    public async Task ShouldPersistOrder()
+    {
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseSqlServer(_sql.GetConnectionString()).Options;
+        await using var ctx = new AppDbContext(options);
+        await ctx.Database.MigrateAsync();
+        // real SQL tests here
+    }
+}
+```
+
+---
+
+## Background Workers (IHostedService)
+
+For long-running non-HTTP tasks.
+
+```csharp
+public class OutboxWorker : BackgroundService
+{
+    protected override async Task ExecuteAsync(CancellationToken ct)
+    {
+        while (!ct.IsCancellationRequested)
+        {
+            await ProcessOutboxAsync(ct);
+            await Task.Delay(TimeSpan.FromSeconds(5), ct);
+        }
+    }
+}
+
+builder.Services.AddHostedService<OutboxWorker>();
+```
+
+---
+
+## Dispatching Domain Events in SaveChangesAsync
+
+```csharp
+public override async Task<int> SaveChangesAsync(CancellationToken ct = default)
+{
+    var events = ChangeTracker.Entries<AggregateRoot>()
+        .SelectMany(e => e.Entity.DomainEvents)
+        .ToList();
+
+    var result = await base.SaveChangesAsync(ct);
+
+    foreach (var domainEvent in events)
+        await _mediator.Publish(domainEvent, ct);
+
+    return result;
+}
+```
+
+---
+
+## Common Interview Questions
+
+1. What is the N+1 problem and how do you fix it?
+2. When would you use `.Include()` vs `.Select()`?
+3. What is the Change Tracker and when would you disable it?
+4. What is the difference between `ExecuteUpdateAsync` and loading + mutating entities?
+5. What is an Interceptor? Give a real use case.
+6. What is optimistic concurrency and how does EF Core implement it?
+7. Why is `UseInMemoryDatabase` bad for integration tests?
+8. What is a Global Query Filter and when would you use it?
+
+---
+
+## Common Mistakes
+
+- Accessing navigation properties in a loop without `.Include()` (N+1)
+- Forgetting `.AsNoTracking()` on read-only queries
+- Using `UseInMemoryDatabase` for integration tests
+- Using bulk operations when domain events or interceptors need to fire
+- Not handling `DbUpdateConcurrencyException` when using `[Timestamp]`
+- Using `AddDbContext` instead of `AddDbContextPool` in high-traffic APIs
+
+---
+
+## How It Connects
+
+- N+1 → always `.Include()` in command handlers, `.Select()` in query handlers (CQRS)
+- Change Tracker + `SaveChangesAsync` override = where Domain Events get dispatched
+- Interceptors handle cross-cutting concerns (audit, tenant stamping)
+- Testcontainers + real SQL = tests that actually catch query bugs
+- Global Query Filters + ITenantProvider = multi-tenancy without polluting every query
+- Bulk operations bypass domain logic — only use for admin/data scripts
+
+---
+
+## My Confidence Level
+- `[b]` N+1 problem and .Include() fix
+- `[b]` Eager loading vs projections — when to use each
+- `[b]` AsNoTracking — when and why
+- `[b]` Owned entities / ComplexProperty (Value Objects)
+- `[b]` Value Converters
+- `[c]` Bulk operations (ExecuteUpdateAsync / ExecuteDeleteAsync)
+- `[b]` Change Tracker states
+- `[~]` Interceptors vs SaveChangesAsync override — when to choose
+- `[b]` Global Query Filters — gap: IgnoreQueryFilters()
+- `[b]` DbContext Pooling
+- `[b]` Optimistic Concurrency (RowVersion)
+- `[b]` Testcontainers
+- `[b]` Background Workers (IHostedService)
+- `[b]` Dispatching Domain Events in SaveChangesAsync
+- `[ ]` Vector Search (EF Core 10)
+- `[ ]` Compiled queries / Raw SQL / Connection resiliency
+
+## My Notes
+<!-- Personal notes -->

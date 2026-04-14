@@ -101,9 +101,22 @@ Update this file after every study session. Be honest.
 - `[b]` Migrations
 - `[b]` Relationships (1:1, 1:N, M:N)
 - `[b]` AsNoTracking
-- `[b]` Query performance, includes vs projections
-- `[b]` Owned entities, value converters
-- `[ ]` Interceptors
+- `[~]` Query performance, includes vs projections
+- `[b]` Owned entities / ComplexProperty (Value Objects)
+- `[b]` Value Converters
+- `[~]` Interceptors (SaveChangesInterceptor)
+- `[c]` Bulk operations (ExecuteUpdateAsync / ExecuteDeleteAsync)
+- `[b]` Change Tracker states
+- `[b]` JSON Columns
+- `[b]` DbContext Pooling
+- `[b]` Optimistic Concurrency (RowVersion)
+- `[b]` Multi-tenancy (Global Query Filters) — gap: IgnoreQueryFilters()
+- `[b]` Testcontainers (real DB integration tests)
+- `[b]` Background Workers (IHostedService)
+- `[b]` Dispatching Domain Events in SaveChangesAsync
+- `[~]` Interceptor vs SaveChangesAsync override — when to choose which
+- `[b]` Backing field EF Core wiring (SetField configuration)
+- `[ ]` Vector Search (EF Core 10)
 
 ### Clean Architecture
 - `[c]` Layer responsibilities
@@ -119,6 +132,26 @@ Update this file after every study session. Be honest.
 - `[b]` Unit of Work
 - `[~]` Bounded contexts
 - `[~]` Ubiquitous language
+- `[b]` Rich vs Anemic domain model
+- `[b]` Backing fields (IReadOnlyCollection)
+- `[b]` Domain Events vs Integration Events
+
+### Shared Kernel
+- `[ ]` Entity vs AggregateRoot base class implementation
+- `[ ]` ValueObject equality implementation
+- `[ ]` IDomainEvent vs IIntegrationEvent — what each is for
+- `[ ]` Result<T> pattern — implement from scratch
+- `[ ]` IUnitOfWork — interface + implementation
+- `[ ]` ErrorCodes — structure and usage
+
+### Modular Monolith
+- `[ ]` Module structure — Domain/Application/Infrastructure/Tests per module
+- `[ ]` Separate DbContext per module with schema-per-module
+- `[ ]` Module registration in Program.cs (extension methods)
+- `[ ]` Public Module API pattern (ICatalogModule)
+- `[ ]` No cross-module EF navigation properties
+- `[ ]` Separate migrations per DbContext
+- `[ ]` When to use in-process call vs integration event
 
 ### CQRS + MediatR
 - `[b]` Command vs Query separation
@@ -127,13 +160,23 @@ Update this file after every study session. Be honest.
 - `[~]` Event sourcing basics
 - `[ ]` Outbox pattern
 
+### Event-Driven Flow
+- `[ ]` Full event flow — domain event → outbox → RabbitMQ → consumer → inbox
+- `[ ]` Outbox pattern — manual implementation
+- `[ ]` MassTransit built-in Outbox setup
+- `[ ]` Inbox pattern — idempotent consumer
+- `[ ]` Dead Letter Queue — configuration and monitoring
+- `[ ]` MassTransit consumer setup
+- `[ ]` Saga basics — state machine for long-running workflows
+- `[ ]` RabbitMQ + Docker setup
+
 ### React Internals
 - `[c]` Components, props, state
 - `[c]` useEffect, useMemo, useCallback
 - `[b]` Reconciliation algorithm
 - `[b]` Virtual DOM
 - `[b]` Rendering optimization (React.memo)
-- `[b]` Concurrent features (Suspense, transitions)
+- `[~]` Concurrent features (Suspense, transitions)
 
 ### RTK Query
 - `[c]` injectEndpoints, baseApi
@@ -170,7 +213,7 @@ Update this file after every study session. Be honest.
 - `[b]` Dockerfile basics
 - `[b]` docker-compose
 - `[~]` Multi-stage builds
-- `[b]` Networking, volumes (named volumes, service name = hostname)
+- `[ ]` Networking, volumes
 - `[ ]` Container registries
 
 ### Testing
@@ -185,12 +228,18 @@ Update this file after every study session. Be honest.
 ## SENIOR LEVEL
 
 ### System Design
-- `[ ]` URL shortener
-- `[ ]` Rate limiter
+- `[b]` URL shortener
+- `[b]` Rate limiter — token bucket, fixed window, sliding window
+- `[b]` Rate limiter — Redis as shared state, Lua atomicity
+- `[b]` API Gateway vs per-service middleware
+- `[b]` Horizontal vs vertical scaling
+- `[b]` Stateless design requirement for horizontal scaling
+- `[b]` Load balancer role and placement
 - `[ ]` News feed / timeline
 - `[ ]` Notification system
 - `[ ]` File storage system
 - `[ ]` Chat system
+- `[ ]` CAP theorem (read, not tested)
 
 ### Caching
 - `[~]` Cache-aside pattern
@@ -223,10 +272,35 @@ Update this file after every study session. Be honest.
 
 ### CI/CD
 - `[b]` GitHub Actions basics
-- `[b]` Build, test, deploy pipeline (order: lint → type check → test → build → docker → deploy)
-- `[b]` Docker build in CI
-- `[b]` Environment secrets management
-- `[b]` Blue/green deployment
+- `[~]` Build, test, deploy pipeline
+- `[ ]` Docker build in CI
+- `[ ]` Environment secrets management
+- `[ ]` Blue/green deployment
+
+### Observability
+- `[ ]` Structured logging with Serilog
+- `[ ]` Log levels — when to use each
+- `[ ]` Metrics — request rate, error rate, p99 latency
+- `[ ]` Distributed tracing — TraceId, spans
+- `[ ]` Health checks — /health/live vs /health/ready
+- `[ ]` Correlation ID pattern
+- `[ ]` OpenTelemetry setup in .NET
+
+### API Gateway
+- `[ ]` What an API Gateway does vs a Load Balancer
+- `[ ]` YARP setup — routes, clusters, destinations
+- `[ ]` JWT validation at gateway, forwarding user identity
+- `[ ]` Rate limiting at gateway level
+- `[ ]` YARP vs Ocelot — when to choose which
+
+### Kubernetes
+- `[ ]` Pod vs Deployment vs Service vs Ingress
+- `[ ]` liveness vs readiness probes
+- `[ ]` Stateless app requirements for K8s
+- `[ ]` ConfigMap and Secret for configuration
+- `[ ]` Rolling updates and rollbacks
+- `[ ]` Basic kubectl commands
+- `[ ]` Docker Compose for local dev vs K8s for production
 
 ---
 

@@ -39,8 +39,10 @@ knowledge-repo/
     ef-core-advanced.md
     clean-architecture.md
     ddd.md
+    shared-kernel.md
+    modular-monolith.md
     cqrs.md
-    react-internals.md
+    event-driven-flow.md
     react-patterns.md
     rtk-query.md
     docker.md
@@ -53,6 +55,9 @@ knowledge-repo/
     advanced-algorithms.md
     microservices.md
     ci-cd.md
+    observability.md
+    api-gateway.md
+    kubernetes.md
 
   ai-integration/
     llm-api-basics.md
