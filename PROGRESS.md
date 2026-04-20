@@ -243,9 +243,9 @@ Update this file after every study session. Be honest.
 
 ### Caching
 - `[b]` Cache-aside pattern
-- `[~]` Write-through / write-behind
-- `[ ]` Redis data structures
-- `[ ]` Cache eviction policies
+- `[b]` Write-through / write-behind
+- `[b]` Redis data structures
+- `[b]` Cache eviction policies
 - `[ ]` Distributed cache consistency
 
 ### Message Queues

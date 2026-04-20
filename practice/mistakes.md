@@ -78,3 +78,10 @@ This file tracks the exact things that tripped you up — which is what intervie
 **Root cause:** Knows Redis exists as a tool but never internalized the pattern mechanics.
 **Fix / key insight:** Cache-aside = check cache first, on miss read DB then write to cache. On update, DELETE the key (never overwrite — avoids race conditions). Thundering herd is the main weakness: many concurrent misses on expiry → use mutex or background refresh.
 **Revisit:** senior/caching.md
+
+## 2026-04-20
+**Topic:** Caching — write-through pattern
+**What happened:** Described cache-aside on a miss instead of write-through. Also didn't know what TTL is.
+**Root cause:** Write-through is about writes, not reads — confused the two. TTL never studied.
+**Fix / key insight:** Write-through = on every write, update DB AND cache in the same operation. TTL = expiry timer on a Redis key — automatic deletion, safety net against stale data forever.
+**Revisit:** senior/caching.md
