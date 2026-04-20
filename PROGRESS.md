@@ -165,7 +165,7 @@ Update this file after every study session. Be honest.
 - `[b]` Outbox pattern — manual implementation
 - `[ ]` MassTransit built-in Outbox setup
 - `[b]` Inbox pattern — idempotent consumer
-- `[ ]` Dead Letter Queue — configuration and monitoring
+- `[b]` Dead Letter Queue — configuration and monitoring
 - `[ ]` MassTransit consumer setup
 - `[b]` Saga basics — state machine for long-running workflows
 - `[ ]` RabbitMQ + Docker setup
