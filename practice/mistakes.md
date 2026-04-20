@@ -71,3 +71,10 @@ This file tracks the exact things that tripped you up — which is what intervie
 **Root cause:** Didn't connect it to the CQRS pattern already in use.
 **Fix / key insight:** Query handlers always use `.Select()` (read-only, DTO, no tracking). Command handlers use `.Include()` (need full aggregate to mutate). This is already the architecture — just apply it consciously.
 **Revisit:** mid/ef-core-advanced.md, mid/cqrs.md
+
+## 2026-04-20
+**Topic:** Caching — cache-aside pattern
+**What happened:** Could only say "we use Redis" — no description of hit/miss flow, no invalidation strategy.
+**Root cause:** Knows Redis exists as a tool but never internalized the pattern mechanics.
+**Fix / key insight:** Cache-aside = check cache first, on miss read DB then write to cache. On update, DELETE the key (never overwrite — avoids race conditions). Thundering herd is the main weakness: many concurrent misses on expiry → use mutex or background refresh.
+**Revisit:** senior/caching.md

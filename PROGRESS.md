@@ -242,7 +242,7 @@ Update this file after every study session. Be honest.
 - `[ ]` CAP theorem (read, not tested)
 
 ### Caching
-- `[~]` Cache-aside pattern
+- `[b]` Cache-aside pattern
 - `[~]` Write-through / write-behind
 - `[ ]` Redis data structures
 - `[ ]` Cache eviction policies
