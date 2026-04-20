@@ -167,7 +167,7 @@ Update this file after every study session. Be honest.
 - `[b]` Inbox pattern — idempotent consumer
 - `[ ]` Dead Letter Queue — configuration and monitoring
 - `[ ]` MassTransit consumer setup
-- `[ ]` Saga basics — state machine for long-running workflows
+- `[b]` Saga basics — state machine for long-running workflows
 - `[ ]` RabbitMQ + Docker setup
 
 ### React Internals
