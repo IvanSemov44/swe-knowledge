@@ -158,13 +158,13 @@ Update this file after every study session. Be honest.
 - `[b]` MediatR pipeline behaviors
 - `[b]` Validation pipeline behavior
 - `[~]` Event sourcing basics
-- `[ ]` Outbox pattern
+- `[b]` Outbox pattern
 
 ### Event-Driven Flow
-- `[ ]` Full event flow — domain event → outbox → RabbitMQ → consumer → inbox
-- `[ ]` Outbox pattern — manual implementation
+- `[b]` Full event flow — domain event → outbox → RabbitMQ → consumer → inbox
+- `[b]` Outbox pattern — manual implementation
 - `[ ]` MassTransit built-in Outbox setup
-- `[ ]` Inbox pattern — idempotent consumer
+- `[b]` Inbox pattern — idempotent consumer
 - `[ ]` Dead Letter Queue — configuration and monitoring
 - `[ ]` MassTransit consumer setup
 - `[ ]` Saga basics — state machine for long-running workflows
@@ -249,11 +249,11 @@ Update this file after every study session. Be honest.
 - `[b]` Distributed cache consistency — cache invalidation via integration events, update DB first then delete Redis key
 
 ### Message Queues
-- `[~]` RabbitMQ basics (exchange, queue, binding)
-- `[~]` Producer/consumer pattern
+- `[b]` RabbitMQ basics (exchange, queue, binding)
+- `[b]` Producer/consumer pattern
 - `[ ]` Dead letter queues
-- `[ ]` Outbox pattern + reliable messaging
-- `[ ]` At-least-once vs exactly-once delivery
+- `[b]` Outbox pattern + reliable messaging
+- `[b]` At-least-once vs exactly-once delivery
 
 ### Advanced Algorithms
 - `[ ]` Dijkstra's shortest path
