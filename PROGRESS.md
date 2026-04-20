@@ -239,14 +239,14 @@ Update this file after every study session. Be honest.
 - `[ ]` Notification system
 - `[ ]` File storage system
 - `[ ]` Chat system
-- `[ ]` CAP theorem (read, not tested)
+- `[b]` CAP theorem (read, not tested)
 
 ### Caching
 - `[b]` Cache-aside pattern
 - `[b]` Write-through / write-behind
 - `[b]` Redis data structures
 - `[b]` Cache eviction policies
-- `[ ]` Distributed cache consistency
+- `[b]` Distributed cache consistency — cache invalidation via integration events, update DB first then delete Redis key
 
 ### Message Queues
 - `[~]` RabbitMQ basics (exchange, queue, binding)
