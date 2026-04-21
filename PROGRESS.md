@@ -275,7 +275,7 @@ Update this file after every study session. Be honest.
 - `[b]` Build, test, deploy pipeline
 - `[b]` Docker build in CI
 - `[b]` Environment secrets management
-- `[ ]` Blue/green deployment
+- `[b]` Blue/green deployment
 
 ### Observability
 - `[b]` Structured logging with Serilog
