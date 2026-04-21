@@ -236,7 +236,7 @@ Update this file after every study session. Be honest.
 - `[b]` Stateless design requirement for horizontal scaling
 - `[b]` Load balancer role and placement
 - `[ ]` News feed / timeline
-- `[ ]` Notification system
+- `[b]` Notification system
 - `[ ]` File storage system
 - `[ ]` Chat system
 - `[b]` CAP theorem (read, not tested)
