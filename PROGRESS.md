@@ -212,8 +212,8 @@ Update this file after every study session. Be honest.
 ### Docker
 - `[b]` Dockerfile basics
 - `[b]` docker-compose
-- `[~]` Multi-stage builds
-- `[ ]` Networking, volumes
+- `[b]` Multi-stage builds
+- `[b]` Networking, volumes
 - `[ ]` Container registries
 
 ### Testing

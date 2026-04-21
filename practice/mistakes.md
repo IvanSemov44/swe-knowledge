@@ -92,3 +92,10 @@ This file tracks the exact things that tripped you up — which is what intervie
 **Root cause:** Missed the core insight: sorted array means start at opposite ends and move inward — large+small, adjust based on sum.
 **Fix / key insight:** left=0, right=arr.Length-1. Sum too small → left++. Sum too big → right--. Both pointers only move toward each other, never past.
 **Revisit:** junior/algorithms.md
+
+## 2026-04-21
+**Topic:** Docker — container networking
+**What happened:** Said `localhost` works between containers because "they're on the same machine."
+**Root cause:** Didn't know each container has its own isolated network namespace. localhost = self, not host or other containers.
+**Fix / key insight:** Use the Docker Compose service name as hostname. API connects to `db:1433`, not `localhost:1433`. Compose creates a shared internal network automatically.
+**Revisit:** junior/docker.md
