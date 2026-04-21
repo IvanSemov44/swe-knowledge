@@ -19,7 +19,7 @@ Update this file after every study session. Be honest.
 - `[~]` Stacks & queues
 - `[~]` Hash maps / hash tables
 - `[b]` Trees (binary tree, BST)
-- `[ ]` Heaps (min/max)
+- `[b]` Heaps (min/max)
 - `[ ]` Tries
 - `[ ]` Graphs (adjacency list vs matrix)
 
