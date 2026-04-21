@@ -30,7 +30,7 @@ Update this file after every study session. Be honest.
 - `[~]` Quick sort
 - `[ ]` BFS
 - `[ ]` DFS
-- `[ ]` Two pointers
+- `[b]` Two pointers
 - `[b]` Sliding window
 - `[ ]` Prefix sums
 - `[ ]` Recursion fundamentals

@@ -85,3 +85,10 @@ This file tracks the exact things that tripped you up — which is what intervie
 **Root cause:** Write-through is about writes, not reads — confused the two. TTL never studied.
 **Fix / key insight:** Write-through = on every write, update DB AND cache in the same operation. TTL = expiry timer on a Redis key — automatic deletion, safety net against stale data forever.
 **Revisit:** senior/caching.md
+
+## 2026-04-21
+**Topic:** DSA — Two pointers
+**What happened:** Started both pointers at the beginning (left=0, right=1) instead of opposite ends.
+**Root cause:** Missed the core insight: sorted array means start at opposite ends and move inward — large+small, adjust based on sum.
+**Fix / key insight:** left=0, right=arr.Length-1. Sum too small → left++. Sum too big → right--. Both pointers only move toward each other, never past.
+**Revisit:** junior/algorithms.md
