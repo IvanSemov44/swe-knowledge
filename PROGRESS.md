@@ -28,8 +28,8 @@ Update this file after every study session. Be honest.
 - `[~]` Bubble / Selection / Insertion sort
 - `[~]` Merge sort
 - `[~]` Quick sort
-- `[ ]` BFS
-- `[ ]` DFS
+- `[b]` BFS
+- `[b]` DFS
 - `[b]` Two pointers
 - `[b]` Sliding window
 - `[ ]` Prefix sums
