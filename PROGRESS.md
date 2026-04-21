@@ -272,8 +272,8 @@ Update this file after every study session. Be honest.
 
 ### CI/CD
 - `[b]` GitHub Actions basics
-- `[~]` Build, test, deploy pipeline
-- `[ ]` Docker build in CI
+- `[b]` Build, test, deploy pipeline
+- `[b]` Docker build in CI
 - `[ ]` Environment secrets management
 - `[ ]` Blue/green deployment
 
