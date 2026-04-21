@@ -32,7 +32,7 @@ Update this file after every study session. Be honest.
 - `[b]` DFS
 - `[b]` Two pointers
 - `[b]` Sliding window
-- `[ ]` Prefix sums
+- `[b]` Prefix sums
 - `[ ]` Recursion fundamentals
 
 ### Big O
