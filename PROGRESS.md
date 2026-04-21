@@ -238,7 +238,7 @@ Update this file after every study session. Be honest.
 - `[b]` News feed / timeline
 - `[b]` Notification system
 - `[ ]` File storage system
-- `[ ]` Chat system
+- `[b]` Chat system
 - `[b]` CAP theorem (read, not tested)
 
 ### Caching
