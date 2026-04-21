@@ -282,7 +282,7 @@ Update this file after every study session. Be honest.
 - `[b]` Log levels — when to use each
 - `[ ]` Metrics — request rate, error rate, p99 latency
 - `[ ]` Distributed tracing — TraceId, spans
-- `[ ]` Health checks — /health/live vs /health/ready
+- `[b]` Health checks — /health/live vs /health/ready
 - `[b]` Correlation ID pattern
 - `[ ]` OpenTelemetry setup in .NET
 
