@@ -274,7 +274,7 @@ Update this file after every study session. Be honest.
 - `[b]` GitHub Actions basics
 - `[b]` Build, test, deploy pipeline
 - `[b]` Docker build in CI
-- `[ ]` Environment secrets management
+- `[b]` Environment secrets management
 - `[ ]` Blue/green deployment
 
 ### Observability
