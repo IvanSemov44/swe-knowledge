@@ -237,7 +237,7 @@ Update this file after every study session. Be honest.
 - `[b]` Load balancer role and placement
 - `[b]` News feed / timeline
 - `[b]` Notification system
-- `[ ]` File storage system
+- `[b]` File storage system
 - `[b]` Chat system
 - `[b]` CAP theorem (read, not tested)
 
