@@ -280,8 +280,8 @@ Update this file after every study session. Be honest.
 ### Observability
 - `[b]` Structured logging with Serilog
 - `[b]` Log levels — when to use each
-- `[ ]` Metrics — request rate, error rate, p99 latency
-- `[ ]` Distributed tracing — TraceId, spans
+- `[b]` Metrics — request rate, error rate, p99 latency
+- `[b]` Distributed tracing — TraceId, spans
 - `[b]` Health checks — /health/live vs /health/ready
 - `[b]` Correlation ID pattern
 - `[ ]` OpenTelemetry setup in .NET
