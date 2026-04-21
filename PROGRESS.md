@@ -31,7 +31,7 @@ Update this file after every study session. Be honest.
 - `[ ]` BFS
 - `[ ]` DFS
 - `[ ]` Two pointers
-- `[ ]` Sliding window
+- `[b]` Sliding window
 - `[ ]` Prefix sums
 - `[ ]` Recursion fundamentals
 
