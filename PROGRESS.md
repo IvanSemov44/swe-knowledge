@@ -235,7 +235,7 @@ Update this file after every study session. Be honest.
 - `[b]` Horizontal vs vertical scaling
 - `[b]` Stateless design requirement for horizontal scaling
 - `[b]` Load balancer role and placement
-- `[ ]` News feed / timeline
+- `[b]` News feed / timeline
 - `[b]` Notification system
 - `[ ]` File storage system
 - `[ ]` Chat system
