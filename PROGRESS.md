@@ -33,7 +33,7 @@ Update this file after every study session. Be honest.
 - `[b]` Two pointers
 - `[b]` Sliding window
 - `[b]` Prefix sums
-- `[ ]` Recursion fundamentals
+- `[b]` Recursion fundamentals
 
 ### Big O
 - `[b]` Time complexity analysis

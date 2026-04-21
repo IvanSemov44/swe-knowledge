@@ -99,3 +99,10 @@ This file tracks the exact things that tripped you up — which is what intervie
 **Root cause:** Didn't know each container has its own isolated network namespace. localhost = self, not host or other containers.
 **Fix / key insight:** Use the Docker Compose service name as hostname. API connects to `db:1433`, not `localhost:1433`. Compose creates a shared internal network automatically.
 **Revisit:** junior/docker.md
+
+## 2026-04-21
+**Topic:** DSA — Recursion
+**What happened:** Wrote Fibonacci instead of factorial, and used iteration not recursion.
+**Root cause:** Didn't recognise the pattern — recursion requires a function calling itself with a base case to stop.
+**Fix / key insight:** Every recursive function needs: (1) base case that returns immediately, (2) recursive call that moves closer to the base case. No base case = stack overflow.
+**Revisit:** junior/algorithms.md
