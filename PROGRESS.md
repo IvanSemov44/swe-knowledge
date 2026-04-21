@@ -278,12 +278,12 @@ Update this file after every study session. Be honest.
 - `[ ]` Blue/green deployment
 
 ### Observability
-- `[ ]` Structured logging with Serilog
-- `[ ]` Log levels — when to use each
+- `[b]` Structured logging with Serilog
+- `[b]` Log levels — when to use each
 - `[ ]` Metrics — request rate, error rate, p99 latency
 - `[ ]` Distributed tracing — TraceId, spans
 - `[ ]` Health checks — /health/live vs /health/ready
-- `[ ]` Correlation ID pattern
+- `[b]` Correlation ID pattern
 - `[ ]` OpenTelemetry setup in .NET
 
 ### API Gateway
