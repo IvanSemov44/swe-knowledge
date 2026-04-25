@@ -196,9 +196,9 @@ Update this file after every study session. Be honest.
 ### Zustand
 - `[b]` create() — basic store with state + actions
 - `[b]` Selecting specific state (avoiding full store subscription)
-- `[ ]` useShallow for multiple fields
-- `[ ]` Async actions
-- `[ ]` persist middleware
+- `[b]` useShallow for multiple fields
+- `[b]` Async actions
+- `[b]` persist middleware
 - `[b]` Zustand vs Redux Toolkit — when to choose which
 
 ### React Patterns
