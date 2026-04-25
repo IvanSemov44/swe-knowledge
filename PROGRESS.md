@@ -137,8 +137,8 @@ Update this file after every study session. Be honest.
 - `[b]` Domain Events vs Integration Events
 
 ### Shared Kernel
-- `[ ]` Entity vs AggregateRoot base class implementation
-- `[ ]` ValueObject equality implementation
+- `[b]` Entity vs AggregateRoot base class implementation
+- `[b]` ValueObject equality implementation
 - `[ ]` IDomainEvent vs IIntegrationEvent — what each is for
 - `[ ]` Result<T> pattern — implement from scratch
 - `[ ]` IUnitOfWork — interface + implementation
