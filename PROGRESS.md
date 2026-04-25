@@ -202,7 +202,7 @@ Update this file after every study session. Be honest.
 - `[ ]` Zustand vs Redux Toolkit — when to choose which
 
 ### React Patterns
-- `[ ]` Error Boundaries — when to use, what they don't catch
+- `[b]` Error Boundaries — when to use, what they don't catch
 - `[ ]` HOC — implement one, explain tradeoffs
 - `[ ]` Render Props — recognize and implement the pattern
 - `[ ]` Compound Components — Context-based sub-component API
