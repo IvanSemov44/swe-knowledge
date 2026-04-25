@@ -145,12 +145,12 @@ Update this file after every study session. Be honest.
 - `[b]` ErrorCodes — structure and usage
 
 ### Modular Monolith
-- `[ ]` Module structure — Domain/Application/Infrastructure/Tests per module
-- `[ ]` Separate DbContext per module with schema-per-module
+- `[b]` Module structure — Domain/Application/Infrastructure/Tests per module
+- `[b]` Separate DbContext per module with schema-per-module
 - `[ ]` Module registration in Program.cs (extension methods)
 - `[ ]` Public Module API pattern (ICatalogModule)
-- `[ ]` No cross-module EF navigation properties
-- `[ ]` Separate migrations per DbContext
+- `[b]` No cross-module EF navigation properties
+- `[b]` Separate migrations per DbContext
 - `[ ]` When to use in-process call vs integration event
 
 ### CQRS + MediatR
