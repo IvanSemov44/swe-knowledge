@@ -194,12 +194,12 @@ Update this file after every study session. Be honest.
 - `[b]` Redux vs RTK Query — what goes where
 
 ### Zustand
-- `[ ]` create() — basic store with state + actions
-- `[ ]` Selecting specific state (avoiding full store subscription)
+- `[b]` create() — basic store with state + actions
+- `[b]` Selecting specific state (avoiding full store subscription)
 - `[ ]` useShallow for multiple fields
 - `[ ]` Async actions
 - `[ ]` persist middleware
-- `[ ]` Zustand vs Redux Toolkit — when to choose which
+- `[b]` Zustand vs Redux Toolkit — when to choose which
 
 ### React Patterns
 - `[b]` Error Boundaries — when to use, what they don't catch
