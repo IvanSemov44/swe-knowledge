@@ -308,17 +308,17 @@ Update this file after every study session. Be honest.
 
 ### LLM API Basics
 - `[b]` OpenAI / Anthropic API structure
-- `[~]` Calling LLM from .NET (HttpClient / SDK)
+- `[b]` Calling LLM from .NET (HttpClient / SDK)
 - `[~]` Calling LLM from React (fetch / SDK)
 - `[ ]` Streaming responses
 - `[ ]` Token counting, cost estimation
 
 ### RAG
 - `[ ]` Chunking strategies
-- `[ ]` Embeddings (what they are, how to generate)
-- `[ ]` Vector stores (pgvector, Qdrant)
-- `[ ]` Similarity search (cosine, dot product)
-- `[ ]` Retrieval pipeline end-to-end
+- `[b]` Embeddings (what they are, how to generate)
+- `[b]` Vector stores (pgvector, Qdrant)
+- `[b]` Similarity search (cosine, dot product)
+- `[b]` Retrieval pipeline end-to-end
 - `[ ]` Re-ranking
 
 ### Agentic Patterns
