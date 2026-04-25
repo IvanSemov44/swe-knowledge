@@ -140,7 +140,7 @@ Update this file after every study session. Be honest.
 - `[b]` Entity vs AggregateRoot base class implementation
 - `[b]` ValueObject equality implementation
 - `[ ]` IDomainEvent vs IIntegrationEvent — what each is for
-- `[ ]` Result<T> pattern — implement from scratch
+- `[b]` Result<T> pattern — implement from scratch
 - `[ ]` IUnitOfWork — interface + implementation
 - `[ ]` ErrorCodes — structure and usage
 
