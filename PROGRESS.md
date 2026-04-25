@@ -141,7 +141,7 @@ Update this file after every study session. Be honest.
 - `[b]` ValueObject equality implementation
 - `[ ]` IDomainEvent vs IIntegrationEvent — what each is for
 - `[b]` Result<T> pattern — implement from scratch
-- `[ ]` IUnitOfWork — interface + implementation
+- `[b]` IUnitOfWork — interface + implementation
 - `[ ]` ErrorCodes — structure and usage
 
 ### Modular Monolith
