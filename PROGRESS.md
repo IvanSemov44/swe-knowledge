@@ -203,11 +203,11 @@ Update this file after every study session. Be honest.
 
 ### React Patterns
 - `[b]` Error Boundaries — when to use, what they don't catch
-- `[ ]` HOC — implement one, explain tradeoffs
+- `[b]` HOC — implement one, explain tradeoffs
 - `[ ]` Render Props — recognize and implement the pattern
 - `[ ]` Compound Components — Context-based sub-component API
 - `[ ]` Portals — when and how to use
-- `[ ]` Custom hooks as the modern replacement for HOC/render props
+- `[b]` Custom hooks as the modern replacement for HOC/render props
 
 ### Docker
 - `[b]` Dockerfile basics
