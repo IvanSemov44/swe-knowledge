@@ -205,7 +205,7 @@ Update this file after every study session. Be honest.
 - `[b]` Error Boundaries — when to use, what they don't catch
 - `[b]` HOC — implement one, explain tradeoffs
 - `[b]` Render Props — recognize and implement the pattern
-- `[ ]` Compound Components — Context-based sub-component API
+- `[b]` Compound Components — Context-based sub-component API
 - `[ ]` Portals — when and how to use
 - `[b]` Custom hooks as the modern replacement for HOC/render props
 
