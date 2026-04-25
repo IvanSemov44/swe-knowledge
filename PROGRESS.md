@@ -147,11 +147,11 @@ Update this file after every study session. Be honest.
 ### Modular Monolith
 - `[b]` Module structure — Domain/Application/Infrastructure/Tests per module
 - `[b]` Separate DbContext per module with schema-per-module
-- `[ ]` Module registration in Program.cs (extension methods)
-- `[ ]` Public Module API pattern (ICatalogModule)
+- `[b]` Module registration in Program.cs (extension methods)
+- `[b]` Public Module API pattern (ICatalogModule)
 - `[b]` No cross-module EF navigation properties
 - `[b]` Separate migrations per DbContext
-- `[ ]` When to use in-process call vs integration event
+- `[b]` When to use in-process call vs integration event
 
 ### CQRS + MediatR
 - `[b]` Command vs Query separation
