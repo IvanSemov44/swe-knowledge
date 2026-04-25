@@ -206,7 +206,7 @@ Update this file after every study session. Be honest.
 - `[b]` HOC — implement one, explain tradeoffs
 - `[b]` Render Props — recognize and implement the pattern
 - `[b]` Compound Components — Context-based sub-component API
-- `[ ]` Portals — when and how to use
+- `[b]` Portals — when and how to use
 - `[b]` Custom hooks as the modern replacement for HOC/render props
 
 ### Docker
