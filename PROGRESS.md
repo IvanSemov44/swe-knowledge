@@ -142,7 +142,7 @@ Update this file after every study session. Be honest.
 - `[ ]` IDomainEvent vs IIntegrationEvent — what each is for
 - `[b]` Result<T> pattern — implement from scratch
 - `[b]` IUnitOfWork — interface + implementation
-- `[ ]` ErrorCodes — structure and usage
+- `[b]` ErrorCodes — structure and usage
 
 ### Modular Monolith
 - `[ ]` Module structure — Domain/Application/Infrastructure/Tests per module
