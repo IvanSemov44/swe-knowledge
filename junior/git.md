@@ -240,6 +240,99 @@ dist/
 
 ---
 
+## Interactive Rebase
+
+Rewrite, reorder, squash, or edit commits before they're shared. Most powerful history-cleaning tool.
+
+```bash
+# Rebase the last 4 commits interactively
+git rebase -i HEAD~4
+
+# Opens editor with:
+pick a1b2c3 Add product entity
+pick d4e5f6 Add repository
+pick g7h8i9 wip
+pick j0k1l2 fix typo
+
+# Change 'pick' to:
+# r (reword)  — keep commit, edit its message
+# s (squash)  — merge into previous commit, combine messages
+# f (fixup)   — merge into previous commit, discard this message
+# d (drop)    — delete the commit entirely
+# e (edit)    — pause rebase here, amend the commit, then continue
+
+# After saving the editor, Git executes your instructions
+# For squash/fixup, another editor opens to write the combined message
+```
+
+**Common use cases:**
+```bash
+# Clean up "wip" and "fix typo" commits before opening a PR
+pick a1b2c3 Add product entity
+pick d4e5f6 Add repository
+f    g7h8i9 wip        ← fold into previous
+f    j0k1l2 fix typo   ← fold into previous
+
+# Result: 2 clean commits instead of 4
+
+# If rebase conflicts: resolve → git add → git rebase --continue
+# To abort:           git rebase --abort
+```
+
+**Rule:** Only rebase commits that haven't been pushed to a shared branch.
+
+---
+
+## reflog — Your Safety Net
+
+`git reflog` records every change to HEAD — including resets, rebases, and checkouts. Nothing is truly lost for 90 days.
+
+```bash
+git reflog
+# Output:
+# a1b2c3 HEAD@{0}: rebase: Add product entity
+# d4e5f6 HEAD@{1}: rebase: checkout refs/heads/main
+# g7h8i9 HEAD@{2}: commit: wip
+# j0k1l2 HEAD@{3}: commit: fix typo
+
+# Accidentally reset --hard and lost commits?
+git reset --hard HEAD@{3}  # restore to 3 moves ago
+
+# Dropped a stash by accident?
+git fsck --no-walk --tags --unreachable --lost-found
+# Find dangling commits and stash entries
+```
+
+---
+
+## bisect — Binary Search for Bugs
+
+Find the commit that introduced a bug without checking each one manually. Uses binary search: O(log n) steps.
+
+```bash
+# Start bisect
+git bisect start
+
+# Tell Git: current commit is broken
+git bisect bad
+
+# Tell Git: this old commit was fine
+git bisect good v1.2.0
+
+# Git checks out the midpoint commit
+# Test whether the bug exists...
+
+git bisect bad   # still broken → bug is in the later half
+git bisect good  # works → bug is in the earlier half
+
+# Git keeps halving until it finds the exact commit
+# Bisect complete: "first bad commit is a1b2c3 — Add payment integration"
+
+git bisect reset  # return to original HEAD
+```
+
+---
+
 ## Common Interview Questions
 
 1. What is the difference between `git fetch` and `git pull`?
@@ -248,6 +341,9 @@ dist/
 4. How do you undo a commit that has already been pushed?
 5. What is a detached HEAD state?
 6. What is the difference between `git stash` and a commit?
+7. What is interactive rebase used for?
+8. What is `git reflog` and when would you use it?
+9. What is `git bisect` and what algorithm does it use?
 
 ---
 

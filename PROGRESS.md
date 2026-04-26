@@ -68,6 +68,32 @@ Update this file after every study session. Be honest.
 - `[b]` PR workflow
 - `[b]` Cherry-pick, stash
 - `[b]` Advanced branching strategies (GitFlow, trunk-based)
+- `[ ]` Interactive rebase — squash, reword, fixup
+- `[ ]` reflog — recovering lost commits
+- `[ ]` bisect — binary search for bug-introducing commit
+
+### Browser Internals
+- `[ ]` DNS → TCP → TLS → HTTP → render — full URL flow
+- `[ ]` HTML parsing → DOM, CSS parsing → CSSOM
+- `[ ]` Render tree, layout, paint, composite pipeline
+- `[ ]` Reflow vs repaint vs composite-only
+- `[ ]` Layout thrashing — causes and fix
+- `[ ]` Core Web Vitals — LCP, CLS, INP
+
+### Clean Code
+- `[ ]` Naming — intent-revealing, no noise words
+- `[ ]` Functions — single responsibility, guard clauses
+- `[ ]` Comments — when to write them (WHY not WHAT)
+- `[ ]` DRY, YAGNI, KISS — applying each correctly
+- `[ ]` Code smells — recognising in review
+
+### Agile & Scrum
+- `[ ]` Agile values — four core trade-offs
+- `[ ]` Scrum roles — PO, SM, Dev Team
+- `[ ]` Sprint ceremonies — planning, standup, review, retro
+- `[ ]` User stories + acceptance criteria
+- `[ ]` Story points, velocity, Definition of Done
+- `[ ]` Scrum vs Kanban
 
 ---
 
@@ -397,6 +423,34 @@ Update this file after every study session. Be honest.
 - `[~]` Span<T>, Memory<T>
 - `[ ]` Source generators
 
+### C# Nullable Reference Types
+- `[ ]` Nullable value types — int?, HasValue
+- `[ ]` Nullable reference types — #nullable enable, compiler tracking
+- `[ ]` Null operators — ?., ??, ??=, !
+- `[ ]` Null check patterns — is null, is not null
+- `[ ]` required members
+- `[ ]` ArgumentNullException.ThrowIfNull
+
+### C# Exception Handling
+- `[ ]` throw vs Result<T> — the decision rule
+- `[ ]` try/catch best practices — specific exceptions, throw vs throw ex
+- `[ ]` Global exception handler — IExceptionHandler (.NET 8)
+- `[ ]` ProblemDetails — RFC 7807
+
+### C# DI Deep Dive
+- `[ ]` Captive dependency — what it is, why it breaks
+- `[ ]` IServiceScopeFactory — creating scopes in Singletons
+- `[ ]` Service Locator anti-pattern
+- `[ ]` Options pattern — IOptions vs IOptionsSnapshot vs IOptionsMonitor
+- `[ ]` Keyed services (.NET 8)
+
+### C# Background Jobs
+- `[ ]` IHostedService / BackgroundService — lifecycle
+- `[ ]` IServiceScopeFactory in background services
+- `[ ]` Channel<T> — producer/consumer pattern
+- `[ ]` Graceful shutdown
+- `[ ]` Hangfire — fire-and-forget, scheduled, recurring
+
 ### C# Concurrency & Thread Safety
 - `[ ]` Thread vs Task — cost and use cases
 - `[ ]` Race conditions — recognizing and fixing
@@ -454,6 +508,41 @@ Update this file after every study session. Be honest.
 - `[b]` React Router
 - `[b]` Forms (controlled vs uncontrolled)
 - `[~]` Performance (memo, lazy, Suspense)
+
+### React Performance
+- `[ ]` When React re-renders — the four triggers
+- `[ ]` React.memo — when it helps vs when it fails
+- `[ ]` useMemo — expensive values, when NOT to use
+- `[ ]` useCallback — stable references, the memo/useCallback/useMemo trio
+- `[ ]` Stale closures in useEffect
+- `[ ]` React.lazy + Suspense — code splitting
+- `[ ]` React Profiler — reading results
+
+### React Forms
+- `[ ]` React Hook Form — register, handleSubmit, formState
+- `[ ]` Zod schemas — string/number/object, refine, coerce
+- `[ ]` z.infer — type from schema
+- `[ ]` setError — mapping server errors to fields
+- `[ ]` useController — custom input components
+- `[ ]` useFieldArray — dynamic lists
+
+### TypeScript with React
+- `[ ]` Typing props — interface, optional, literal unions
+- `[ ]` Event types — ChangeEvent, FormEvent, MouseEvent
+- `[ ]` Typing useState / useRef / useReducer
+- `[ ]` Typing Context — undefined default + custom hook
+- `[ ]` Generic components
+- `[ ]` forwardRef typing
+
+### TypeScript / JavaScript
+- `[c]` Types, interfaces, generics
+- `[c]` async/await, Promises
+- `[b]` Closures
+- `[b]` Event loop, call stack, microtask queue
+- `[b]` Hoisting
+- `[~]` Currying, partial application
+- `[~]` Prototype chain
+- `[ ]` Promise.all vs allSettled vs race vs any
 
 ### React Native
 - `[b]` Core components (View, Text, ScrollView, FlatList)

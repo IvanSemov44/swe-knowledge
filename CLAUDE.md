@@ -301,6 +301,51 @@ Pick from this list when Ivan has no preference:
 
 ---
 
+## Knowledge Completeness Checklist
+
+At the **start of every session**, scan the repo against this list. If a category has no file AND no meaningful coverage in an existing file, flag it to Ivan and offer to add it — don't wait for him to ask.
+
+### Must-Have for Junior-to-Mid .NET + React Remote Role
+
+**C# / .NET**
+- `csharp-nullable.md` — nullable reference types, null operators
+- `csharp-exception-handling.md` — throw vs Result<T>, ProblemDetails, global handler
+- `csharp-di-deep.md` — captive dependency, IServiceScopeFactory, Options pattern
+- `csharp-background-jobs.md` — IHostedService, BackgroundService, Channel<T>, Hangfire
+- `csharp-concurrency.md` — lock, SemaphoreSlim, async pitfalls
+- `csharp-memory.md` — GC, boxing, Span<T>, ArrayPool
+
+**TypeScript + React**
+- `typescript-advanced.md` — utility types, discriminated unions, type guards
+- `typescript-react.md` — typing props, events, refs, hooks, generic components
+- `react-performance.md` — memo, useMemo, useCallback, Profiler
+- `react-forms.md` — React Hook Form + Zod
+- `nextjs.md` — SSR/SSG/ISR, App Router, Server Components
+
+**JavaScript / Browser**
+- `typescript-js.md` → Promise.all vs allSettled vs race vs any section
+- `browser-internals.md` — full URL flow, render pipeline, reflow vs repaint
+
+**Database**
+- `sql-advanced.md` — CTEs, index types, execution plans, deadlocks
+- `ef-core-advanced.md` → production migrations section
+
+**General**
+- `clean-code.md` — naming, guard clauses, DRY/YAGNI/KISS, code smells
+- `agile-scrum.md` — roles, ceremonies, user stories, story points
+- `junior/git.md` → interactive rebase, reflog, bisect sections
+- `behavioral.md` — STAR method, core stories, project walkthrough
+- `security-depth.md` — CORS, CSRF, XSS, SQL injection
+
+### Gap Detection Rules
+
+1. If a file in the list above **does not exist** → tell Ivan immediately, offer to create it
+2. If a file exists but **its confidence level is all `[ ]`** → suggest starting with that topic
+3. After adding a file → add all its topics to `PROGRESS.md` with `[ ]` status
+4. After a teaching session → update confidence levels in `PROGRESS.md` honestly
+
+---
+
 ## Useful Context for This Session
 
 - Today's date: see session context
