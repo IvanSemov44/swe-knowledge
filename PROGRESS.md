@@ -55,7 +55,7 @@ Update this file after every study session. Be honest.
 - `[b]` Indexes (when and why)
 - `[b]` Transactions (ACID)
 - `[b]` Normalization (1NF/2NF/3NF)
-- `[~]` N+1 query problem
+- `[b]` N+1 query problem
 
 ### Git
 - `[c]` Add, commit, push, pull
