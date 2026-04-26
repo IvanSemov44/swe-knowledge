@@ -300,6 +300,180 @@ order.Should().BeEquivalentTo(expected, opts => opts.Excluding(o => o.CreatedAt)
 
 ---
 
+---
+
+## Test Doubles — Mock vs Stub vs Spy vs Fake vs Dummy
+
+These terms are often used interchangeably in conversation ("just mock it"), but they mean different things. Interviews test whether you know the distinctions.
+
+| Double | What it does | When to use |
+|---|---|---|
+| **Dummy** | Passed around but never used. Fills a required parameter. | Constructor parameters you don't care about in this test |
+| **Stub** | Returns a pre-configured answer to calls. No verification. | When you need to control what a dependency returns |
+| **Mock** | Verifies that specific calls were made with specific arguments. | When the test cares THAT something was called (not just what it returned) |
+| **Spy** | A real object that records what was called. Verify after. | When you want real behavior but also want to assert calls |
+| **Fake** | A working implementation, simpler than production. | In-memory repository, in-memory queue |
+
+```csharp
+// STUB — control what the dependency returns, don't verify calls
+_uowMock.Setup(u => u.Products.GetByIdAsync(id, It.IsAny<CancellationToken>()))
+        .ReturnsAsync(product); // just return this, don't care about verification
+
+// MOCK — verify the interaction happened
+_uowMock.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
+// Fails the test if CommitAsync was not called exactly once
+
+// FAKE — in-memory implementation used instead of real DB
+public class InMemoryOrderRepository : IOrderRepository
+{
+    private readonly List<Order> _orders = new();
+    public Task<Order?> GetByIdAsync(Guid id, CancellationToken ct)
+        => Task.FromResult(_orders.FirstOrDefault(o => o.Id == id));
+    public void Add(Order order) => _orders.Add(order);
+}
+
+// DUMMY — don't care about this parameter
+var dummyCancellationToken = CancellationToken.None; // not relevant to this test
+
+// SPY (with Moq — CallBase + verify)
+var spy = new Mock<IOrderRepository> { CallBase = true };
+// ... use spy ...
+spy.Verify(r => r.Add(It.IsAny<Order>()), Times.Once);
+```
+
+**Key rule:** Mock behaviors you own, don't mock external libraries directly.
+**Key rule:** Verify behavior (MOCK) only when the call itself IS the outcome. If the outcome is the return value, use a STUB.
+
+---
+
+## React Testing Library
+
+Test React components the way a user would interact with them — by querying the DOM, not component internals.
+
+### Setup
+
+```bash
+npm install --save-dev @testing-library/react @testing-library/user-event @testing-library/jest-dom
+```
+
+### Core Principles
+
+```typescript
+// WRONG — testing implementation details
+expect(component.state.isLoading).toBe(false);
+expect(wrapper.find('Button').props().onClick).toBeDefined();
+
+// RIGHT — testing what the user sees and interacts with
+expect(screen.getByText('Add to Cart')).toBeInTheDocument();
+await userEvent.click(screen.getByRole('button', { name: /add to cart/i }));
+```
+
+### Queries (priority order — use highest priority first)
+
+```typescript
+// 1. Role — most accessible query (tests a11y too)
+screen.getByRole('button', { name: /submit/i });
+screen.getByRole('heading', { name: /products/i });
+screen.getByRole('textbox', { name: /email/i });
+
+// 2. Label text — for form inputs
+screen.getByLabelText(/email address/i);
+
+// 3. Placeholder text
+screen.getByPlaceholderText(/search products/i);
+
+// 4. Text content
+screen.getByText(/order confirmed/i);
+
+// 5. Test ID — last resort (implementation detail)
+screen.getByTestId('cart-count'); // avoid unless necessary
+```
+
+**getBy vs queryBy vs findBy:**
+```typescript
+getByRole('button')    // throws if not found — use when element must exist
+queryByRole('button')  // returns null if not found — use to assert absence
+findByRole('button')   // async, waits for element — use for async rendering
+```
+
+### Example: Testing a Form
+
+```typescript
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { LoginForm } from './LoginForm';
+
+describe('LoginForm', () => {
+  it('calls onSubmit with email and password when form is submitted', async () => {
+    const onSubmit = jest.fn();
+    render(<LoginForm onSubmit={onSubmit} />);
+
+    // Arrange — fill the form
+    await userEvent.type(
+      screen.getByLabelText(/email/i),
+      'ivan@example.com'
+    );
+    await userEvent.type(
+      screen.getByLabelText(/password/i),
+      'secret123'
+    );
+
+    // Act — submit
+    await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
+
+    // Assert — check what the user sees
+    expect(onSubmit).toHaveBeenCalledWith({
+      email: 'ivan@example.com',
+      password: 'secret123',
+    });
+  });
+
+  it('shows validation error when email is empty', async () => {
+    render(<LoginForm onSubmit={jest.fn()} />);
+    await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
+    expect(screen.getByText(/email is required/i)).toBeInTheDocument();
+  });
+});
+```
+
+### Testing Async Components (RTK Query / loading states)
+
+```typescript
+import { renderWithProviders } from '../test-utils'; // custom render with Redux store
+import { server } from '../mocks/server'; // MSW mock server
+import { rest } from 'msw';
+
+it('shows products after loading', async () => {
+  renderWithProviders(<ProductList />);
+
+  // Loading state
+  expect(screen.getByRole('progressbar')).toBeInTheDocument();
+
+  // Wait for products to appear
+  await screen.findAllByRole('article'); // findBy = async wait
+  expect(screen.getAllByRole('article')).toHaveLength(3);
+});
+
+it('shows error message when API fails', async () => {
+  server.use(
+    rest.get('/api/products', (req, res, ctx) =>
+      res(ctx.status(500)))
+  );
+
+  renderWithProviders(<ProductList />);
+  expect(await screen.findByText(/something went wrong/i)).toBeInTheDocument();
+});
+```
+
+### What NOT to Test in React
+
+- Component implementation details (state, props structure, method calls)
+- Styling/CSS classes directly
+- Third-party library internals (RTK Query, React Router internals)
+- Snapshot tests that auto-update — they just confirm the last render, not behavior
+
+---
+
 ## Common Interview Questions
 
 1. What is the test pyramid and why does it matter?
@@ -308,6 +482,9 @@ order.Should().BeEquivalentTo(expected, opts => opts.Excluding(o => o.CreatedAt)
 4. What should you mock in unit tests?
 5. What is TestContainers and why is it better than in-memory databases for integration tests?
 6. What is a test data builder?
+7. What is the difference between a Mock and a Stub?
+8. What is the difference between `getBy`, `queryBy`, and `findBy` in React Testing Library?
+9. Why does React Testing Library encourage querying by role over test IDs?
 
 ---
 
