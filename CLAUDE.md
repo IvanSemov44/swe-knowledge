@@ -205,7 +205,7 @@ This repo is Ivan's active learning system. Your job is to **test him, teach gap
 ### On Session Start
 
 1. **Read `PROGRESS.md`** — note any topic marked `[ ]` or `[~]` in the current priority list.
-2. **Read `practice/mistakes.md`** — check recent entries for recurring weak spots.
+2. **Read `practice/mistakes.md`** — find any entries where `Revisit by` date has passed. Quiz Ivan on those first (no hints, no teaching). Score each one. Only then move to new material.
 3. **Ask Ivan what he wants**, OR suggest the highest-priority topic from the list below.
 4. **Do not start explaining.** Follow the test-then-teach loop.
 
@@ -261,6 +261,7 @@ Use this whenever a topic is marked `[b]` or above — simulate real interview p
    **Root cause:** [misconception, forgotten detail, etc.]
    **Fix / key insight:** [correct understanding]
    **Revisit:** [link to relevant knowledge file]
+   **Revisit by:** YYYY-MM-DD (set 3–5 days out)
    ```
 3. **Knowledge files** — if you taught something not well covered, expand the relevant file.
 4. **Commit** to the current working branch with a clear message like `"update: PROGRESS.md after concurrency session"`.
