@@ -63,7 +63,7 @@ Update this file after every study session. Be honest.
 - `[b]` Rebase vs merge
 - `[b]` PR workflow
 - `[b]` Cherry-pick, stash
-- `[ ]` Advanced branching strategies (GitFlow, trunk-based)
+- `[b]` Advanced branching strategies (GitFlow, trunk-based)
 
 ---
 
