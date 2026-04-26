@@ -188,7 +188,7 @@ Update this file after every study session. Be honest.
 ### Redux Toolkit
 - `[b]` Slices (actions, reducers, Immer)
 - `[b]` Typed hooks (useAppSelector, useAppDispatch)
-- `[~]` createSelector / memoized selectors
+- `[b]` createSelector / memoized selectors
 - `[b]` createAsyncThunk + extraReducers
 - `[b]` Redux DevTools
 - `[b]` Redux vs RTK Query — what goes where
