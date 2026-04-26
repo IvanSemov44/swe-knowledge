@@ -149,6 +149,65 @@ const [orders, products] = await Promise.all([
 
 ---
 
+## Promise Coordination — all vs allSettled vs race vs any
+
+Four static methods for running multiple promises. Know the differences cold.
+
+```typescript
+const p1 = fetch('/api/products');   // succeeds in 100ms
+const p2 = fetch('/api/categories'); // succeeds in 200ms
+const p3 = fetch('/api/users');      // FAILS after 150ms
+
+// Promise.all — ALL must succeed. Rejects immediately on first failure.
+try {
+    const [products, categories, users] = await Promise.all([p1, p2, p3]);
+    // Never reached — p3 failed
+} catch (err) {
+    // err = p3's rejection reason
+    // p1 and p2 results are LOST — you can't access them
+}
+// Use when: all results are required; failure of any = failure of the whole operation
+
+// Promise.allSettled — waits for ALL, never rejects. Returns status for each.
+const results = await Promise.allSettled([p1, p2, p3]);
+results.forEach(result => {
+    if (result.status === 'fulfilled') {
+        console.log('Success:', result.value);
+    } else {
+        console.log('Failed:', result.reason);
+    }
+});
+// Use when: you want all results regardless of partial failure
+// e.g., send 100 emails — collect successes and failures, don't stop on first error
+
+// Promise.race — resolves/rejects with the FIRST settled promise (whichever finishes first)
+const result = await Promise.race([
+    fetch('/api/data'),
+    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
+]);
+// Use when: timeout pattern — race your operation against a timeout promise
+
+// Promise.any — resolves with the FIRST successful promise. Only rejects if ALL fail.
+const fastestCdn = await Promise.any([
+    fetch('https://cdn1.example.com/data'),
+    fetch('https://cdn2.example.com/data'),
+    fetch('https://cdn3.example.com/data'),
+]);
+// Use when: trying multiple sources — first success wins, failures are ignored
+// Throws AggregateError if ALL fail
+```
+
+**Decision guide:**
+
+| Method | Rejects if | Use for |
+|---|---|---|
+| `Promise.all` | Any fails | All required, fail fast |
+| `Promise.allSettled` | Never | Report all outcomes |
+| `Promise.race` | First settles (success or fail) | Timeout pattern |
+| `Promise.any` | All fail | First success wins (fallback chain) |
+
+---
+
 ## TypeScript Generics
 
 ```typescript

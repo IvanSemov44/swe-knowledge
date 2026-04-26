@@ -352,6 +352,106 @@ public override async Task<int> SaveChangesAsync(CancellationToken ct = default)
 
 ---
 
+## Production Migration Strategies
+
+Running EF Core migrations in production requires more care than `dotnet ef database update`. The goal is zero-downtime deploys.
+
+### The Problem with Simple Migrations
+
+If you add a `NOT NULL` column without a default, SQL Server locks the entire table while it backfills. For large tables, this causes downtime.
+
+### Expand / Contract Pattern (zero-downtime)
+
+Deploy schema changes in two phases so old and new code can run simultaneously.
+
+```
+Phase 1 — EXPAND (backward compatible):
+  - Add new nullable column (no lock)
+  - Deploy new code that writes to BOTH old and new column
+  - Run background migration to backfill old rows
+
+Phase 2 — CONTRACT (cleanup):
+  - Add NOT NULL constraint + default (after all rows backfilled)
+  - Remove old column
+  - Deploy code that only uses new column
+```
+
+```csharp
+// Migration Phase 1 — add nullable, no table lock
+public partial class AddProductSlug_Phase1 : Migration
+{
+    protected override void Up(MigrationBuilder migrationBuilder)
+    {
+        // Nullable — no backfill needed, no lock
+        migrationBuilder.AddColumn<string>(
+            name: "Slug",
+            table: "Products",
+            nullable: true);
+    }
+}
+
+// Migration Phase 2 — after backfill, enforce NOT NULL
+public partial class AddProductSlug_Phase2 : Migration
+{
+    protected override void Up(MigrationBuilder migrationBuilder)
+    {
+        // Set default for any remaining nulls, then constrain
+        migrationBuilder.Sql("UPDATE Products SET Slug = LOWER(REPLACE(Name, ' ', '-')) WHERE Slug IS NULL");
+
+        migrationBuilder.AlterColumn<string>(
+            name: "Slug",
+            table: "Products",
+            nullable: false,
+            defaultValue: "");
+    }
+}
+```
+
+### Running Migrations at Deploy Time
+
+```csharp
+// Program.cs — auto-migrate on startup (acceptable for small apps/dev)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.MigrateAsync();
+}
+```
+
+```bash
+# CLI — apply migrations as part of deployment pipeline (preferred for production)
+dotnet ef database update --connection "$PROD_CONNECTION_STRING"
+
+# Or use a dedicated migration runner project / SQL scripts
+dotnet ef migrations script --idempotent --output migrate.sql
+# --idempotent generates IF NOT EXISTS checks — safe to run multiple times
+```
+
+### Migration Safety Checklist
+
+```
+✅ Adding a nullable column             — safe, no lock
+✅ Adding a table                       — safe
+✅ Adding an index ONLINE               — safe (SQL Server Enterprise: WITH (ONLINE=ON))
+✅ Adding a NOT NULL column WITH DEFAULT — safe (SQL Server: default applied without rewrite)
+⚠️  Adding a NOT NULL column without default — table lock on large tables → use expand/contract
+⚠️  Dropping a column still used by old code — breaks old code still deployed
+⚠️  Renaming a column                   — breaks old code → add new + migrate + drop old
+❌ Dropping a table in use              — data loss
+```
+
+### Idempotent Migration Scripts
+
+```bash
+# Generate a SQL script that checks if each migration has been applied
+dotnet ef migrations script --idempotent -o deploy/migrations.sql
+
+# The script checks the __EFMigrationsHistory table before applying each migration
+# Safe to run in CI/CD even if some migrations already applied
+```
+
+---
+
 ## My Confidence Level
 - `[b]` N+1 problem and .Include() fix
 - `[b]` Eager loading vs projections — when to use each
@@ -367,6 +467,7 @@ public override async Task<int> SaveChangesAsync(CancellationToken ct = default)
 - `[b]` Testcontainers
 - `[b]` Background Workers (IHostedService)
 - `[b]` Dispatching Domain Events in SaveChangesAsync
+- `[ ]` Production migrations — expand/contract, idempotent scripts
 - `[ ]` Vector Search (EF Core 10)
 - `[ ]` Compiled queries / Raw SQL / Connection resiliency
 
