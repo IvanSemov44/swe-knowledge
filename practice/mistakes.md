@@ -119,3 +119,35 @@ This file tracks the exact things that tripped you up — which is what intervie
 **Fix / key insight:** Every recursive function needs: (1) base case that returns immediately, (2) recursive call that moves closer to the base case. No base case = stack overflow.
 **Revisit:** junior/algorithms.md
 **Revisit by:** 2026-04-27
+
+## 2026-04-26
+**Topic:** Security — CORS preflight
+**What happened:** Knew CORS needs a policy on the server but didn't mention the OPTIONS preflight request or the `Access-Control-Allow-Origin` response header.
+**Root cause:** Knows CORS exists as a config step, not the browser mechanism behind it.
+**Fix / key insight:** Browser sends OPTIONS preflight first. Server must respond with `Access-Control-Allow-Origin` header. Without it the browser blocks the response — the request still hits the server, the browser just hides the response from JS.
+**Revisit:** mid/security-depth.md
+**Revisit by:** 2026-05-01
+
+## 2026-04-26
+**Topic:** Security — CSRF vs localStorage JWT
+**What happened:** Said localStorage is "easy to steal" (XSS risk) instead of explaining why it's immune to CSRF. Got the two attack types mixed up.
+**Root cause:** Confused CSRF vulnerability (auto-sent cookies) with XSS vulnerability (JS-readable storage). Two completely different attack vectors.
+**Fix / key insight:** CSRF works because browsers auto-attach cookies to every request — even from malicious sites. localStorage is never auto-sent and can't be read cross-origin. Fix for cookie auth: `SameSite=Strict` or `SameSite=Lax`.
+**Revisit:** mid/security-depth.md
+**Revisit by:** 2026-05-01
+
+## 2026-04-26
+**Topic:** Security — Stored XSS
+**What happened:** Blank answer — no knowledge of XSS types.
+**Root cause:** Never studied XSS. Topic is `[ ]` in PROGRESS.md.
+**Fix / key insight:** Stored XSS = malicious script saved to DB, executes in every visitor's browser. Two fixes: (1) escape output on render — React does this automatically, never use `dangerouslySetInnerHTML` with user input; (2) CSP header `Content-Security-Policy: default-src 'self'` blocks inline scripts even if they reach the HTML.
+**Revisit:** mid/security-depth.md
+**Revisit by:** 2026-05-01
+
+## 2026-04-26
+**Topic:** Security — HTTP security headers
+**What happened:** Named made-up headers. None of the three answers were real standard security headers.
+**Root cause:** Never studied security headers. No mental model at all.
+**Fix / key insight:** Three must-know: `Content-Security-Policy: default-src 'self'` (kills XSS), `X-Frame-Options: DENY` (prevents clickjacking), `Strict-Transport-Security: max-age=31536000; includeSubDomains` (forces HTTPS).
+**Revisit:** mid/security-depth.md
+**Revisit by:** 2026-05-01
