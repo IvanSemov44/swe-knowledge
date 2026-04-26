@@ -176,7 +176,7 @@ Update this file after every study session. Be honest.
 - `[b]` Reconciliation algorithm
 - `[b]` Virtual DOM
 - `[b]` Rendering optimization (React.memo)
-- `[~]` Concurrent features (Suspense, transitions)
+- `[b]` Concurrent features (Suspense, transitions)
 
 ### RTK Query
 - `[c]` injectEndpoints, baseApi
