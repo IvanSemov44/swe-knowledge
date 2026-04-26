@@ -95,7 +95,7 @@ Update this file after every study session. Be honest.
 - `[b]` OAuth2 flows
 - `[b]` Cookies vs tokens
 - `[~]` HTTPS, TLS basics
-- `[~]` OWASP top 10
+- `[b]` OWASP top 10
 
 ### EF Core Advanced
 - `[b]` Migrations
