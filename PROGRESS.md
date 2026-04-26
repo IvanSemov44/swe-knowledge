@@ -18,9 +18,9 @@ Update this file after every study session. Be honest.
 - `[~]` Linked lists (singly, doubly)
 - `[~]` Stacks & queues
 - `[~]` Hash maps / hash tables
-- `[ ]` Trees (binary tree, BST)
-- `[ ]` Heaps (min/max)
-- `[ ]` Tries
+- `[b]` Trees (binary tree, BST)
+- `[b]` Heaps (min/max)
+- `[b]` Tries
 - `[ ]` Graphs (adjacency list vs matrix)
 
 ### Algorithms
@@ -28,12 +28,12 @@ Update this file after every study session. Be honest.
 - `[~]` Bubble / Selection / Insertion sort
 - `[~]` Merge sort
 - `[~]` Quick sort
-- `[ ]` BFS
-- `[ ]` DFS
-- `[ ]` Two pointers
-- `[ ]` Sliding window
-- `[ ]` Prefix sums
-- `[ ]` Recursion fundamentals
+- `[b]` BFS
+- `[b]` DFS
+- `[b]` Two pointers
+- `[b]` Sliding window
+- `[b]` Prefix sums
+- `[b]` Recursion fundamentals
 
 ### Big O
 - `[b]` Time complexity analysis
@@ -47,7 +47,7 @@ Update this file after every study session. Be honest.
 - `[b]` Headers, content negotiation
 - `[b]` REST constraints
 - `[b]` Idempotency
-- `[~]` API versioning strategies
+- `[b]` API versioning strategies
 
 ### SQL Basics
 - `[c]` SELECT, WHERE, ORDER BY, GROUP BY
@@ -55,15 +55,15 @@ Update this file after every study session. Be honest.
 - `[b]` Indexes (when and why)
 - `[b]` Transactions (ACID)
 - `[b]` Normalization (1NF/2NF/3NF)
-- `[~]` N+1 query problem
+- `[b]` N+1 query problem
 
 ### Git
 - `[c]` Add, commit, push, pull
 - `[c]` Branching, merging
 - `[b]` Rebase vs merge
 - `[b]` PR workflow
-- `[~]` Cherry-pick, stash
-- `[ ]` Advanced branching strategies (GitFlow, trunk-based)
+- `[b]` Cherry-pick, stash
+- `[b]` Advanced branching strategies (GitFlow, trunk-based)
 
 ---
 
@@ -95,7 +95,7 @@ Update this file after every study session. Be honest.
 - `[b]` OAuth2 flows
 - `[b]` Cookies vs tokens
 - `[~]` HTTPS, TLS basics
-- `[~]` OWASP top 10
+- `[b]` OWASP top 10
 
 ### EF Core Advanced
 - `[b]` Migrations
@@ -137,37 +137,37 @@ Update this file after every study session. Be honest.
 - `[b]` Domain Events vs Integration Events
 
 ### Shared Kernel
-- `[ ]` Entity vs AggregateRoot base class implementation
-- `[ ]` ValueObject equality implementation
+- `[b]` Entity vs AggregateRoot base class implementation
+- `[b]` ValueObject equality implementation
 - `[ ]` IDomainEvent vs IIntegrationEvent — what each is for
-- `[ ]` Result<T> pattern — implement from scratch
-- `[ ]` IUnitOfWork — interface + implementation
-- `[ ]` ErrorCodes — structure and usage
+- `[b]` Result<T> pattern — implement from scratch
+- `[b]` IUnitOfWork — interface + implementation
+- `[b]` ErrorCodes — structure and usage
 
 ### Modular Monolith
-- `[ ]` Module structure — Domain/Application/Infrastructure/Tests per module
-- `[ ]` Separate DbContext per module with schema-per-module
-- `[ ]` Module registration in Program.cs (extension methods)
-- `[ ]` Public Module API pattern (ICatalogModule)
-- `[ ]` No cross-module EF navigation properties
-- `[ ]` Separate migrations per DbContext
-- `[ ]` When to use in-process call vs integration event
+- `[b]` Module structure — Domain/Application/Infrastructure/Tests per module
+- `[b]` Separate DbContext per module with schema-per-module
+- `[b]` Module registration in Program.cs (extension methods)
+- `[b]` Public Module API pattern (ICatalogModule)
+- `[b]` No cross-module EF navigation properties
+- `[b]` Separate migrations per DbContext
+- `[b]` When to use in-process call vs integration event
 
 ### CQRS + MediatR
 - `[b]` Command vs Query separation
 - `[b]` MediatR pipeline behaviors
 - `[b]` Validation pipeline behavior
 - `[~]` Event sourcing basics
-- `[ ]` Outbox pattern
+- `[b]` Outbox pattern
 
 ### Event-Driven Flow
-- `[ ]` Full event flow — domain event → outbox → RabbitMQ → consumer → inbox
-- `[ ]` Outbox pattern — manual implementation
+- `[b]` Full event flow — domain event → outbox → RabbitMQ → consumer → inbox
+- `[b]` Outbox pattern — manual implementation
 - `[ ]` MassTransit built-in Outbox setup
-- `[ ]` Inbox pattern — idempotent consumer
-- `[ ]` Dead Letter Queue — configuration and monitoring
+- `[b]` Inbox pattern — idempotent consumer
+- `[b]` Dead Letter Queue — configuration and monitoring
 - `[ ]` MassTransit consumer setup
-- `[ ]` Saga basics — state machine for long-running workflows
+- `[b]` Saga basics — state machine for long-running workflows
 - `[ ]` RabbitMQ + Docker setup
 
 ### React Internals
@@ -176,7 +176,7 @@ Update this file after every study session. Be honest.
 - `[b]` Reconciliation algorithm
 - `[b]` Virtual DOM
 - `[b]` Rendering optimization (React.memo)
-- `[~]` Concurrent features (Suspense, transitions)
+- `[b]` Concurrent features (Suspense, transitions)
 
 ### RTK Query
 - `[c]` injectEndpoints, baseApi
@@ -187,33 +187,33 @@ Update this file after every study session. Be honest.
 
 ### Redux Toolkit
 - `[b]` Slices (actions, reducers, Immer)
-- `[ ]` Typed hooks (useAppSelector, useAppDispatch)
-- `[~]` createSelector / memoized selectors
+- `[b]` Typed hooks (useAppSelector, useAppDispatch)
+- `[b]` createSelector / memoized selectors
 - `[b]` createAsyncThunk + extraReducers
-- `[ ]` Redux DevTools
+- `[b]` Redux DevTools
 - `[b]` Redux vs RTK Query — what goes where
 
 ### Zustand
-- `[ ]` create() — basic store with state + actions
-- `[ ]` Selecting specific state (avoiding full store subscription)
-- `[ ]` useShallow for multiple fields
-- `[ ]` Async actions
-- `[ ]` persist middleware
-- `[ ]` Zustand vs Redux Toolkit — when to choose which
+- `[b]` create() — basic store with state + actions
+- `[b]` Selecting specific state (avoiding full store subscription)
+- `[b]` useShallow for multiple fields
+- `[b]` Async actions
+- `[b]` persist middleware
+- `[b]` Zustand vs Redux Toolkit — when to choose which
 
 ### React Patterns
-- `[ ]` Error Boundaries — when to use, what they don't catch
-- `[ ]` HOC — implement one, explain tradeoffs
-- `[ ]` Render Props — recognize and implement the pattern
-- `[ ]` Compound Components — Context-based sub-component API
-- `[ ]` Portals — when and how to use
-- `[ ]` Custom hooks as the modern replacement for HOC/render props
+- `[b]` Error Boundaries — when to use, what they don't catch
+- `[b]` HOC — implement one, explain tradeoffs
+- `[b]` Render Props — recognize and implement the pattern
+- `[b]` Compound Components — Context-based sub-component API
+- `[b]` Portals — when and how to use
+- `[b]` Custom hooks as the modern replacement for HOC/render props
 
 ### Docker
 - `[b]` Dockerfile basics
 - `[b]` docker-compose
-- `[~]` Multi-stage builds
-- `[ ]` Networking, volumes
+- `[b]` Multi-stage builds
+- `[b]` Networking, volumes
 - `[ ]` Container registries
 
 ### Testing
@@ -235,25 +235,25 @@ Update this file after every study session. Be honest.
 - `[b]` Horizontal vs vertical scaling
 - `[b]` Stateless design requirement for horizontal scaling
 - `[b]` Load balancer role and placement
-- `[ ]` News feed / timeline
-- `[ ]` Notification system
-- `[ ]` File storage system
-- `[ ]` Chat system
-- `[ ]` CAP theorem (read, not tested)
+- `[b]` News feed / timeline
+- `[b]` Notification system
+- `[b]` File storage system
+- `[b]` Chat system
+- `[b]` CAP theorem (read, not tested)
 
 ### Caching
-- `[~]` Cache-aside pattern
-- `[~]` Write-through / write-behind
-- `[ ]` Redis data structures
-- `[ ]` Cache eviction policies
-- `[ ]` Distributed cache consistency
+- `[b]` Cache-aside pattern
+- `[b]` Write-through / write-behind
+- `[b]` Redis data structures
+- `[b]` Cache eviction policies
+- `[b]` Distributed cache consistency — cache invalidation via integration events, update DB first then delete Redis key
 
 ### Message Queues
-- `[~]` RabbitMQ basics (exchange, queue, binding)
-- `[~]` Producer/consumer pattern
+- `[b]` RabbitMQ basics (exchange, queue, binding)
+- `[b]` Producer/consumer pattern
 - `[ ]` Dead letter queues
-- `[ ]` Outbox pattern + reliable messaging
-- `[ ]` At-least-once vs exactly-once delivery
+- `[b]` Outbox pattern + reliable messaging
+- `[b]` At-least-once vs exactly-once delivery
 
 ### Advanced Algorithms
 - `[ ]` Dijkstra's shortest path
@@ -272,18 +272,18 @@ Update this file after every study session. Be honest.
 
 ### CI/CD
 - `[b]` GitHub Actions basics
-- `[~]` Build, test, deploy pipeline
-- `[ ]` Docker build in CI
-- `[ ]` Environment secrets management
-- `[ ]` Blue/green deployment
+- `[b]` Build, test, deploy pipeline
+- `[b]` Docker build in CI
+- `[b]` Environment secrets management
+- `[b]` Blue/green deployment
 
 ### Observability
-- `[ ]` Structured logging with Serilog
-- `[ ]` Log levels — when to use each
-- `[ ]` Metrics — request rate, error rate, p99 latency
-- `[ ]` Distributed tracing — TraceId, spans
-- `[ ]` Health checks — /health/live vs /health/ready
-- `[ ]` Correlation ID pattern
+- `[b]` Structured logging with Serilog
+- `[b]` Log levels — when to use each
+- `[b]` Metrics — request rate, error rate, p99 latency
+- `[b]` Distributed tracing — TraceId, spans
+- `[b]` Health checks — /health/live vs /health/ready
+- `[b]` Correlation ID pattern
 - `[ ]` OpenTelemetry setup in .NET
 
 ### API Gateway
@@ -308,17 +308,17 @@ Update this file after every study session. Be honest.
 
 ### LLM API Basics
 - `[b]` OpenAI / Anthropic API structure
-- `[~]` Calling LLM from .NET (HttpClient / SDK)
+- `[b]` Calling LLM from .NET (HttpClient / SDK)
 - `[~]` Calling LLM from React (fetch / SDK)
 - `[ ]` Streaming responses
 - `[ ]` Token counting, cost estimation
 
 ### RAG
 - `[ ]` Chunking strategies
-- `[ ]` Embeddings (what they are, how to generate)
-- `[ ]` Vector stores (pgvector, Qdrant)
-- `[ ]` Similarity search (cosine, dot product)
-- `[ ]` Retrieval pipeline end-to-end
+- `[b]` Embeddings (what they are, how to generate)
+- `[b]` Vector stores (pgvector, Qdrant)
+- `[b]` Similarity search (cosine, dot product)
+- `[b]` Retrieval pipeline end-to-end
 - `[ ]` Re-ranking
 
 ### Agentic Patterns

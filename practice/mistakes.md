@@ -71,3 +71,38 @@ This file tracks the exact things that tripped you up — which is what intervie
 **Root cause:** Didn't connect it to the CQRS pattern already in use.
 **Fix / key insight:** Query handlers always use `.Select()` (read-only, DTO, no tracking). Command handlers use `.Include()` (need full aggregate to mutate). This is already the architecture — just apply it consciously.
 **Revisit:** mid/ef-core-advanced.md, mid/cqrs.md
+
+## 2026-04-20
+**Topic:** Caching — cache-aside pattern
+**What happened:** Could only say "we use Redis" — no description of hit/miss flow, no invalidation strategy.
+**Root cause:** Knows Redis exists as a tool but never internalized the pattern mechanics.
+**Fix / key insight:** Cache-aside = check cache first, on miss read DB then write to cache. On update, DELETE the key (never overwrite — avoids race conditions). Thundering herd is the main weakness: many concurrent misses on expiry → use mutex or background refresh.
+**Revisit:** senior/caching.md
+
+## 2026-04-20
+**Topic:** Caching — write-through pattern
+**What happened:** Described cache-aside on a miss instead of write-through. Also didn't know what TTL is.
+**Root cause:** Write-through is about writes, not reads — confused the two. TTL never studied.
+**Fix / key insight:** Write-through = on every write, update DB AND cache in the same operation. TTL = expiry timer on a Redis key — automatic deletion, safety net against stale data forever.
+**Revisit:** senior/caching.md
+
+## 2026-04-21
+**Topic:** DSA — Two pointers
+**What happened:** Started both pointers at the beginning (left=0, right=1) instead of opposite ends.
+**Root cause:** Missed the core insight: sorted array means start at opposite ends and move inward — large+small, adjust based on sum.
+**Fix / key insight:** left=0, right=arr.Length-1. Sum too small → left++. Sum too big → right--. Both pointers only move toward each other, never past.
+**Revisit:** junior/algorithms.md
+
+## 2026-04-21
+**Topic:** Docker — container networking
+**What happened:** Said `localhost` works between containers because "they're on the same machine."
+**Root cause:** Didn't know each container has its own isolated network namespace. localhost = self, not host or other containers.
+**Fix / key insight:** Use the Docker Compose service name as hostname. API connects to `db:1433`, not `localhost:1433`. Compose creates a shared internal network automatically.
+**Revisit:** junior/docker.md
+
+## 2026-04-21
+**Topic:** DSA — Recursion
+**What happened:** Wrote Fibonacci instead of factorial, and used iteration not recursion.
+**Root cause:** Didn't recognise the pattern — recursion requires a function calling itself with a base case to stop.
+**Fix / key insight:** Every recursive function needs: (1) base case that returns immediately, (2) recursive call that moves closer to the base case. No base case = stack overflow.
+**Revisit:** junior/algorithms.md
