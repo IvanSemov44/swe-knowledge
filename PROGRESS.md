@@ -47,7 +47,7 @@ Update this file after every study session. Be honest.
 - `[b]` Headers, content negotiation
 - `[b]` REST constraints
 - `[b]` Idempotency
-- `[~]` API versioning strategies
+- `[b]` API versioning strategies
 
 ### SQL Basics
 - `[c]` SELECT, WHERE, ORDER BY, GROUP BY
