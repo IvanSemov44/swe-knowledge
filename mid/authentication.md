@@ -83,13 +83,46 @@ OAuth2 is an authorization framework — it lets users grant third-party apps li
 4. Google redirects back with `code`
 5. App exchanges `code` for access + refresh tokens (server-to-server, secret not exposed)
 
-**PKCE (Proof Key for Code Exchange):** Extension for SPAs/mobile where client secret can't be kept secret. Uses a code verifier/challenge pair.
+### PKCE — Proof Key for Code Exchange (required for SPAs and mobile)
+
+SPAs can't keep a `client_secret` safe (it would be in the JavaScript bundle). PKCE replaces the client secret with a one-time cryptographic proof.
+
+```
+1. Client generates a random code_verifier (e.g., 128 random bytes, base64url encoded)
+2. Client computes code_challenge = BASE64URL(SHA256(code_verifier))
+3. Client sends code_challenge in the authorization request
+4. Server stores code_challenge
+5. Client receives authorization code
+6. Client exchanges code + code_verifier for tokens
+7. Server hashes code_verifier → must match stored code_challenge → proof of identity
+```
+
+**Why it prevents attacks:**
+- If an attacker intercepts the authorization code, they can't exchange it — they don't have the `code_verifier`
+- The `code_verifier` is never sent until the final exchange step
+- Even if they intercept the exchange request, the `code_verifier` is single-use
+
+```typescript
+// React SPA — PKCE handled by OIDC libraries (oidc-client-ts, Auth0 SDK, etc.)
+// You don't implement this manually — but you need to understand it
+
+import { UserManager } from 'oidc-client-ts';
+
+const userManager = new UserManager({
+  authority: 'https://auth.myapp.com',
+  client_id: 'spa-client',
+  redirect_uri: 'https://app.myapp.com/callback',
+  response_type: 'code',        // Authorization Code Flow
+  scope: 'openid profile email',
+  // PKCE is enabled by default in oidc-client-ts
+});
+```
 
 ### Client Credentials Flow (machine-to-machine)
 No user involved. Service authenticates with client_id + client_secret to get a token for API calls.
 
 ### Implicit Flow (deprecated)
-Don't use. Tokens in URL fragment, unsafe.
+Don't use. Tokens in URL fragment, unsafe. PKCE replaces this for SPAs.
 
 ---
 
@@ -99,14 +132,43 @@ Don't use. Tokens in URL fragment, unsafe.
 |---|---|---|
 | Storage | Browser handles automatically | localStorage, sessionStorage, or memory |
 | XSS protection | HttpOnly prevents JS access | Vulnerable if in localStorage |
-| CSRF protection | Need CSRF token | Not vulnerable (browser doesn't auto-send) |
+| CSRF protection | Need CSRF token or SameSite | Not vulnerable (browser doesn't auto-send headers) |
 | Mobile support | Complex | Easy (just set the header) |
 | Stateless? | Can be (JWT in cookie) | Yes |
 | Best for | Web apps (same domain) | SPAs, mobile, microservices |
 
 **Best practice for SPAs:**
 - Store access token in **memory** (not localStorage — XSS risk)
-- Store refresh token in **HttpOnly Secure cookie** (not accessible to JS)
+- Store refresh token in **HttpOnly + Secure + SameSite=Strict cookie** (not accessible to JS)
+
+### Cookie Security Attributes
+
+```csharp
+// HttpOnly — prevents JavaScript from reading the cookie
+// Secure — only sent over HTTPS
+// SameSite — controls when the browser sends the cookie cross-site
+options.Cookie.HttpOnly = true;
+options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+options.Cookie.SameSite = SameSiteMode.Strict;
+```
+
+| Attribute | What it prevents |
+|---|---|
+| `HttpOnly` | XSS stealing the cookie via `document.cookie` |
+| `Secure` | Cookie sent over plain HTTP (man-in-the-middle) |
+| `SameSite=Strict` | CSRF — cookie not sent on any cross-site request |
+| `SameSite=Lax` | CSRF for form POSTs — cookie not sent on cross-site POST (but sent on GET navigations) |
+| `SameSite=None` | Required for cross-site cookies (third-party, embedded) — must also set `Secure` |
+
+**Session-based auth vs Token-based auth:**
+
+| | Session | JWT Token |
+|---|---|---|
+| State stored | Server (DB or Redis) | Client (token contains claims) |
+| Revocation | Immediate (delete session) | Hard — must wait for expiry or use token blocklist |
+| Scalability | Needs shared session store (Redis) for horizontal scaling | Stateless — any server can validate |
+| Size | Small (session ID only) | Larger (claims in token) |
+| Best for | Traditional server-rendered apps | APIs, SPAs, microservices |
 
 ---
 

@@ -198,6 +198,106 @@ Content-Type: application/json; charset=utf-8
 
 ---
 
+## HTTP/2 vs HTTP/1.1
+
+### HTTP/1.1 Problems
+
+- **Head-of-line blocking:** Requests on a connection queue up — request 2 must wait for request 1 to complete
+- **Connection limit:** Browsers work around this by opening up to 6 TCP connections per origin — wasteful
+- **Uncompressed headers:** `Cookie`, `User-Agent`, and other large headers sent in full on every request
+
+### HTTP/2 Improvements
+
+| Feature | HTTP/1.1 | HTTP/2 |
+|---|---|---|
+| Connections | 6 per origin (browser limit) | 1 (multiplexed) |
+| Parallelism | Limited by connections | Unlimited streams per connection |
+| Headers | Plain text, repeated every request | HPACK compressed, deduped |
+| Protocol | Text | Binary frames |
+| Server Push | No | Yes (proactively send resources) |
+
+**Multiplexing** is the key improvement — multiple requests and responses travel simultaneously over a single TCP connection as independent "streams."
+
+```
+HTTP/1.1: GET /style.css → wait → GET /app.js → wait → GET /data.json (sequential on one connection)
+HTTP/2:   GET /style.css  ──────────────────► response   (all streams
+          GET /app.js     ──────────────────► response    in parallel
+          GET /data.json  ──────────────────► response    on 1 connection)
+```
+
+**In ASP.NET Core:** HTTP/2 is enabled by default in Kestrel — no code changes needed. Protocol negotiated via ALPN in TLS handshake.
+
+---
+
+## WebSockets vs Server-Sent Events vs Long Polling
+
+When REST request-response isn't enough and you need real-time or server-push.
+
+### Long Polling
+
+Client sends request → server holds it open until data is ready → responds → client immediately sends another.
+
+```
+Client: GET /events → (holds open for 30s) → Server sends event → Client immediately GETs again
+```
+
+Pros: Works everywhere. No special infrastructure.
+Cons: High overhead (full HTTP round-trip per event). Latency.
+Use when: Simple notifications, fallback.
+
+### Server-Sent Events (SSE)
+
+One HTTP connection kept open. Server pushes text events whenever they occur. **One direction: server → client only.**
+
+```typescript
+// Client
+const events = new EventSource('/api/notifications');
+events.onmessage = (event) => handleNotification(JSON.parse(event.data));
+```
+
+```csharp
+// ASP.NET Core
+Response.Headers.Add("Content-Type", "text/event-stream");
+while (!ct.IsCancellationRequested)
+{
+    var notification = await GetNextNotificationAsync(ct);
+    await Response.WriteAsync($"data: {JsonSerializer.Serialize(notification)}\n\n", ct);
+    await Response.Body.FlushAsync(ct);
+}
+```
+
+Pros: Simple, HTTP-based, auto-reconnects, works through proxies.
+Use for: Order status updates, live dashboards, notification feeds.
+
+### WebSockets
+
+HTTP upgrade → full-duplex TCP connection. **Both sides can send at any time.**
+
+```typescript
+// Client
+const ws = new WebSocket('wss://app.com/ws/chat');
+ws.onmessage = (e) => handleMessage(JSON.parse(e.data));
+ws.send(JSON.stringify({ type: 'message', text: 'Hello' }));
+```
+
+Pros: Bidirectional. Low latency. Binary or text.
+Cons: Stateful — harder to scale horizontally (need sticky sessions or pub/sub backplane).
+Use for: Chat, collaborative editing, multiplayer games.
+
+**In ASP.NET Core:** Use SignalR — abstracts WebSockets with automatic fallbacks and a hub-based API.
+
+### Decision Matrix
+
+| Use case | Technology |
+|---|---|
+| Order status updates | SSE |
+| Live dashboard (server pushes only) | SSE |
+| Chat / collaboration | WebSockets / SignalR |
+| Simple notifications | Long polling or SSE |
+| Trading / multiplayer game | WebSockets |
+
+---
+
 ## In ASP.NET Core
 
 ```csharp

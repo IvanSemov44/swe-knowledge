@@ -48,6 +48,8 @@ Update this file after every study session. Be honest.
 - `[b]` REST constraints
 - `[b]` Idempotency
 - `[b]` API versioning strategies
+- `[ ]` HTTP/2 — multiplexing, header compression
+- `[ ]` WebSockets vs SSE vs long polling — when each
 
 ### SQL Basics
 - `[c]` SELECT, WHERE, ORDER BY, GROUP BY
@@ -56,6 +58,8 @@ Update this file after every study session. Be honest.
 - `[b]` Transactions (ACID)
 - `[b]` Normalization (1NF/2NF/3NF)
 - `[b]` N+1 query problem
+- `[b]` Window functions (ROW_NUMBER, RANK, LAG, LEAD)
+- `[b]` HAVING vs WHERE (execution order)
 
 ### Git
 - `[c]` Add, commit, push, pull
@@ -96,6 +100,15 @@ Update this file after every study session. Be honest.
 - `[b]` Cookies vs tokens
 - `[~]` HTTPS, TLS basics
 - `[b]` OWASP top 10
+- `[ ]` PKCE — how it works, why SPAs need it
+- `[ ]` HttpOnly + Secure + SameSite cookie attributes
+- `[ ]` Session-based vs token-based auth — trade-offs
+- `[ ]` CORS — preflight, headers, ASP.NET Core setup
+- `[ ]` CSRF — how the attack works, SameSite defense
+- `[ ]` XSS — stored vs reflected vs DOM, CSP, React safety
+- `[ ]` SQL injection prevention — parameterized queries
+- `[ ]` Security headers (X-Frame-Options, CSP, etc.)
+- `[ ]` Secrets management — user secrets, env vars, Key Vault
 
 ### EF Core Advanced
 - `[b]` Migrations
@@ -216,12 +229,45 @@ Update this file after every study session. Be honest.
 - `[b]` Networking, volumes
 - `[ ]` Container registries
 
+### Resilience Patterns
+- `[ ]` Retry with exponential backoff + jitter
+- `[ ]` Circuit breaker — three states, thresholds
+- `[ ]` Timeout pattern
+- `[ ]` Bulkhead isolation
+- `[ ]` Fallback pattern
+- `[ ]` Polly v8 ResiliencePipeline API
+- `[ ]` HttpClientFactory + Polly integration
+
+### API Design (Advanced)
+- `[ ]` Offset vs cursor/keyset pagination — trade-offs
+- `[ ]` GraphQL — query model, N+1, when over REST
+- `[ ]` gRPC — Protobuf, streaming, when over REST
+- `[ ]` Idempotency keys for POST endpoints
+
+### SQL Advanced
+- `[ ]` CTEs — basic and recursive
+- `[ ]` Clustered vs non-clustered indexes
+- `[ ]` Covering indexes
+- `[ ]` Composite index column order
+- `[ ]` Execution plans — table scan vs index seek
+- `[ ]` Deadlocks — causes and prevention
+- `[ ]` Connection pooling + DbContext lifetime
+
+### Behavioral
+- `[ ]` STAR method
+- `[ ]` Core stories prepared
+- `[ ]` "Tell me about yourself" pitch
+- `[ ]` Technical project walkthrough
+
 ### Testing
 - `[b]` Unit testing with xUnit
 - `[b]` Mocking with Moq
 - `[~]` Integration testing with TestContainers
 - `[~]` What to test and what not to test
 - `[ ]` Frontend testing (React Testing Library)
+- `[ ]` Test doubles — Mock vs Stub vs Spy vs Fake vs Dummy
+- `[ ]` RTL queries — getBy vs queryBy vs findBy, role-first approach
+- `[ ]` Testing async components with RTL + MSW
 
 ---
 
@@ -351,6 +397,27 @@ Update this file after every study session. Be honest.
 - `[~]` Span<T>, Memory<T>
 - `[ ]` Source generators
 
+### C# Concurrency & Thread Safety
+- `[ ]` Thread vs Task — cost and use cases
+- `[ ]` Race conditions — recognizing and fixing
+- `[ ]` lock / Monitor — rules and limits
+- `[ ]` SemaphoreSlim — async critical sections
+- `[ ]` Interlocked — atomic operations
+- `[ ]` Thread-safe collections — ConcurrentDictionary gotchas
+- `[ ]` async/await pitfalls — .Result deadlock, async void
+- `[ ]` ConfigureAwait(false) — when needed
+- `[ ]` CancellationToken propagation
+
+### C# Memory Management
+- `[ ]` Value types vs reference types — stack vs heap
+- `[ ]` Boxing and unboxing — where it happens, impact
+- `[ ]` GC generations (Gen0/1/2) and LOH
+- `[b]` IDisposable — using statement, Dispose pattern
+- `[~]` Span<T>, Memory<T> — zero-allocation slices
+- `[ ]` ArrayPool<T> — renting buffers
+- `[ ]` String interning and StringBuilder
+- `[ ]` WeakReference
+
 ### TypeScript / JavaScript
 - `[c]` Types, interfaces, generics
 - `[c]` async/await, Promises
@@ -359,6 +426,16 @@ Update this file after every study session. Be honest.
 - `[b]` Hoisting
 - `[~]` Currying, partial application
 - `[~]` Prototype chain
+
+### TypeScript Advanced Types
+- `[ ]` Utility types (Partial, Required, Pick, Omit, Record, Exclude, Extract, NonNullable, ReturnType)
+- `[ ]` Discriminated unions + exhaustive narrowing with never
+- `[ ]` Type guards (typeof, instanceof, in, user-defined is)
+- `[ ]` Mapped types
+- `[ ]` Conditional types + infer
+- `[ ]` Template literal types
+- `[ ]` satisfies operator
+- `[ ]` Generic constraints
 
 ### ASP.NET Core
 - `[c]` Controllers, routing, model binding
@@ -385,3 +462,12 @@ Update this file after every study session. Be honest.
 - `[~]` WatermelonDB (offline-first)
 - `[ ]` Native modules
 - `[ ]` Performance profiling
+
+### Next.js
+- `[ ]` SSR vs SSG vs ISR vs CSR — trade-offs and use cases
+- `[ ]` App Router — directory structure (layout, page, loading, error)
+- `[ ]` Server Components vs Client Components — rules, constraints
+- `[ ]` Data fetching in Server Components
+- `[ ]` Route Handlers (API routes in App Router)
+- `[ ]` Middleware — auth checks, redirects
+- `[ ]` Next.js vs Vite + React — when to choose which
