@@ -156,12 +156,19 @@ Update this file after every study session. Be honest.
 - `[~]` Interceptor vs SaveChangesAsync override — when to choose which
 - `[b]` Backing field EF Core wiring (SetField configuration)
 - `[ ]` Vector Search (EF Core 10)
+- `[ ]` Dapper — when to drop down from EF Core, raw SQL with mapping
+
+### Alternative Databases
+- `[ ]` MongoDB basics — documents, collections, BSON, CRUD with C# driver
+- `[ ]` LiteDB — embedded NoSQL for local/offline use cases
+- `[ ]` When to choose NoSQL vs relational
 
 ### Clean Architecture
 - `[c]` Layer responsibilities
 - `[c]` Dependency rule
 - `[b]` Interfaces at boundaries
 - `[b]` Use case pattern
+- `[ ]` Vertical Slice Architecture — feature folders, no shared layers, REPR pattern
 
 ### DDD
 - `[b]` Entities vs Value Objects
@@ -290,6 +297,7 @@ Update this file after every study session. Be honest.
 - `[b]` Mocking with Moq
 - `[~]` Integration testing with TestContainers
 - `[~]` What to test and what not to test
+- `[ ]` Bogus — generating realistic fake test data (Faker<T>)
 - `[ ]` Frontend testing (React Testing Library)
 - `[ ]` Test doubles — Mock vs Stub vs Spy vs Fake vs Dummy
 - `[ ]` RTL queries — getBy vs queryBy vs findBy, role-first approach
@@ -319,6 +327,9 @@ Update this file after every study session. Be honest.
 - `[b]` Redis data structures
 - `[b]` Cache eviction policies
 - `[b]` Distributed cache consistency — cache invalidation via integration events, update DB first then delete Redis key
+- `[ ]` IMemoryCache — in-process cache, size limits, eviction callbacks
+- `[ ]` HybridCache (.NET 9) — L1 in-memory + L2 Redis, stampede protection built-in
+- `[ ]` FusionCache — L1/L2, soft/hard timeouts, fail-safe stale value
 
 ### Message Queues
 - `[b]` RabbitMQ basics (exchange, queue, binding)
@@ -421,6 +432,8 @@ Update this file after every study session. Be honest.
 - `[b]` Delegates, events, Func/Action
 - `[b]` IDisposable, using pattern
 - `[~]` Span<T>, Memory<T>
+- `[ ]` JSON — System.Text.Json (serialization options, custom converters, JsonDocument)
+- `[ ]` XML — XDocument, XmlSerializer basics
 - `[ ]` Source generators
 
 ### C# Nullable Reference Types
@@ -499,6 +512,10 @@ Update this file after every study session. Be honest.
 - `[b]` Configuration (appsettings, environment)
 - `[~]` Minimal APIs
 - `[ ]` SignalR
+- `[ ]` OpenAPI / Swagger — setup, versioning, operation filters
+- `[ ]` Response Compression — middleware setup, Brotli vs Gzip
+- `[ ]` HttpClient + HttpClientFactory — named/typed clients, lifetime gotcha
+- `[ ]` Refit — typed REST clients, interface-based HTTP calls
 
 ### React
 - `[c]` JSX, components, props
