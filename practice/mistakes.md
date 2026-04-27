@@ -151,3 +151,67 @@ This file tracks the exact things that tripped you up — which is what intervie
 **Fix / key insight:** Three must-know: `Content-Security-Policy: default-src 'self'` (kills XSS), `X-Frame-Options: DENY` (prevents clickjacking), `Strict-Transport-Security: max-age=31536000; includeSubDomains` (forces HTTPS).
 **Revisit:** mid/security-depth.md
 **Revisit by:** 2026-05-01
+
+## 2026-04-27
+**Topic:** React Native — FlatList virtualization
+**What happened:** Chose FlatList correctly but described off-screen items as "in a buffer."
+**Root cause:** Knows to use FlatList but lacks the precise mechanism — virtualization = unmount off-screen items entirely, not buffer them.
+**Fix / key insight:** FlatList uses virtualization — it unmounts items that scroll off-screen and mounts new ones as you scroll. There is no buffer. ScrollView renders all children at once. Key word: virtualization.
+**Revisit:** my-stack/react-native.md
+**Revisit by:** 2026-05-02
+
+## 2026-04-27
+**Topic:** Microservices — concrete costs for small teams
+**What happened:** Correctly pushed back on day-one microservices but only said "boilerplate" and "complexity" — too vague.
+**Root cause:** Knows the conclusion but not the specific costs.
+**Fix / key insight:** Name the costs: distributed transactions (no ACID across services, need sagas), network failures (every call can timeout), operational overhead (separate deploy/health/monitoring per service). Microservices solve org-scale problems (Conway's Law), not code problems. 3 devs = all overhead, no benefit.
+**Revisit:** senior/microservices.md
+**Revisit by:** 2026-05-02
+
+## 2026-04-27
+**Topic:** CI/CD — missing type check and deploy steps
+**What happened:** Listed lint → test → build → docker build → docker push. Missing type check and deploy.
+**Root cause:** Knows the middle of the pipeline but forgets the cheap early step (type check) and the final goal (deploy).
+**Fix / key insight:** Full order: lint → type check → tests → build → docker build → docker push → deploy. Tag Docker image with commit SHA for traceability.
+**Revisit:** junior/docker.md
+**Revisit by:** 2026-05-02
+
+## 2026-04-27
+**Topic:** React.memo + useCallback — skipped the mechanism
+**What happened:** Got the right answer (wrap onClick in useCallback) but gave no explanation of why.
+**Root cause:** Knows the rule but not the reasoning under it.
+**Fix / key insight:** Every render creates a new function object in memory. React.memo does a shallow prop comparison — a new function reference always fails that check. useCallback stabilizes the reference across renders so memo can skip the re-render. Strings/primitives pass because their value is compared, not reference.
+**Revisit:** my-stack/react-performance.md
+**Revisit by:** 2026-05-02
+
+## 2026-04-27
+**Topic:** EF Core N+1 — calling Include on a loaded entity
+**What happened:** Tried to call `.Include()` on a loaded entity instance inside a loop. Code wouldn't compile.
+**Root cause:** Mental model is wrong — thinks Include() is called after loading. It's a query builder method called before materializing.
+**Fix / key insight:** N+1 happens silently via navigation property access in a loop (lazy loading fires a DB query per item). Fix: call `.Include(p => p.Images)` on the IQueryable before `.ToListAsync()`. For query handlers, use `.Select()` projection instead.
+**Revisit:** mid/ef-core-advanced.md
+**Revisit by:** 2026-05-02
+
+## 2026-04-27
+**Topic:** Caching — cache-aside pattern (again)
+**What happened:** Blank — no recall 7 days after being taught.
+**Root cause:** Pattern not retained.
+**Fix / key insight:** Check cache → miss → read DB → write Redis → return. On update: write DB then DELETE Redis key (never overwrite — race condition). Thundering herd = many concurrent misses on expiry → use mutex or background refresh.
+**Revisit:** senior/caching.md
+**Revisit by:** 2026-05-02
+
+## 2026-04-27
+**Topic:** Caching — write-through + TTL (again)
+**What happened:** Blank — no recall 7 days after being taught.
+**Root cause:** Pattern not retained.
+**Fix / key insight:** Write-through = on every write, update DB AND Redis in one operation. Always cache-fresh, slightly slower writes. TTL = expiry timer on a Redis key — safety net against stale data living forever.
+**Revisit:** senior/caching.md
+**Revisit by:** 2026-05-02
+
+## 2026-04-27
+**Topic:** Recursion — missing base case
+**What happened:** Wrote the recursive call correctly but omitted the base case entirely.
+**Root cause:** Knows the concept, forgets to write the stopping condition under pressure.
+**Fix / key insight:** Every recursive function requires a base case that returns immediately without recursing. No base case = infinite recursion = stack overflow. For factorial: `if (n == 0) return 1`.
+**Revisit:** junior/algorithms.md
+**Revisit by:** 2026-05-02

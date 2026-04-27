@@ -30,10 +30,10 @@ Update this file after every study session. Be honest.
 - `[~]` Quick sort
 - `[b]` BFS
 - `[b]` DFS
-- `[b]` Two pointers
+- `[c]` Two pointers
 - `[b]` Sliding window
 - `[b]` Prefix sums
-- `[b]` Recursion fundamentals
+- `[~]` Recursion fundamentals
 
 ### Big O
 - `[b]` Time complexity analysis
@@ -314,8 +314,8 @@ Update this file after every study session. Be honest.
 - `[b]` CAP theorem (read, not tested)
 
 ### Caching
-- `[b]` Cache-aside pattern
-- `[b]` Write-through / write-behind
+- `[~]` Cache-aside pattern
+- `[~]` Write-through / write-behind
 - `[b]` Redis data structures
 - `[b]` Cache eviction policies
 - `[b]` Distributed cache consistency — cache invalidation via integration events, update DB first then delete Redis key
