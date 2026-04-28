@@ -24,6 +24,14 @@ This file tracks the exact things that tripped you up — which is what intervie
 
 <!-- AI: add entries below after each session -->
 
+## 2026-04-28
+**Topic:** DDD — Integration Events vs Domain Events
+**What happened:** Answered "outbox pattern" for both parts of the question — named the reliability mechanism but didn't name the cross-BC communication pattern (Integration Event) at all.
+**Root cause:** Knows Outbox exists and what it does, but hasn't separated the two distinct concepts: what you send (Integration Event) vs how you guarantee delivery (Outbox).
+**Fix / key insight:** Domain Event = in-process, same BC, MediatR. Integration Event = crosses BC boundary, message broker (RabbitMQ/Kafka). Outbox is the delivery guarantee for Integration Events: write event row in same DB transaction as state change, background worker publishes later.
+**Revisit:** mid/ddd.md
+**Revisit by:** 2026-05-03
+
 ## 2026-04-09
 **Topic:** React Native — FlatList vs ScrollView
 **What happened:** Said FlatList is "more complex and heavy" — correct direction but missed the key reason: virtualization.

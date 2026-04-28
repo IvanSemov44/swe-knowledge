@@ -314,6 +314,90 @@ In a monolith: separate namespaces/modules. In microservices: separate services.
 
 ---
 
+#### What a BC Must Contain
+
+Each BC owns:
+- Its **own domain model** — classes shaped by what *that* BC needs, not a global shared model
+- Its **own database schema** (or at minimum its own tables) — no cross-BC joins
+- Its **own ubiquitous language** — "Product" in Ordering ≠ "Product" in Inventory
+- Its **own integration event handlers** — keeps its local copy in sync via events
+
+```
+Ordering BC
+├── Domain/
+│   └── Entities/
+│       └── OrderProduct.cs        ← BC's own Product representation
+│           (ProductId, Name, UnitPrice, Currency)
+├── Application/
+│   └── IntegrationEventHandlers/
+│       └── ProductPriceChangedHandler.cs  ← reacts to Inventory events
+└── Infrastructure/
+    └── Persistence/
+        └── OrderingDbContext.cs    ← owns schema: ordering.OrderProducts
+
+Inventory BC
+├── Domain/
+│   └── Entities/
+│       └── Product.cs             ← completely separate class
+│           (ProductId, SKU, StockLevel, ReorderThreshold, WarehouseLocation)
+└── Infrastructure/
+    └── Persistence/
+        └── InventoryDbContext.cs   ← owns schema: inventory.Products
+```
+
+#### Why Not Share a Single Product Class?
+
+A shared class creates **tight coupling**. If Inventory adds `WarehouseLocation`, Ordering now knows about it. One change breaks the boundary and propagates to all consumers.
+
+Rule: **one shared class = hidden dependency between BCs**.
+
+#### How BCs Communicate
+
+BCs never call each other's repositories or share DB tables. They communicate through **Integration Events** over a message broker.
+
+```
+[Inventory BC]
+  Product.ChangePrice() → raises PriceChangedDomainEvent
+  SaveChangesAsync:
+    → product row updated
+    → outbox row inserted       ← same DB transaction (atomicity guarantee)
+  Background worker:
+    → reads outbox row
+    → publishes ProductPriceChangedIntegrationEvent to RabbitMQ
+    → marks outbox row processed
+
+[Ordering BC]
+  Consumer receives ProductPriceChangedIntegrationEvent
+    → updates its own OrderProduct table
+```
+
+Key difference between event types:
+
+| | Domain Event | Integration Event |
+|---|---|---|
+| Scope | Within one BC | Crosses BC boundary |
+| Transport | In-memory (MediatR) | Message broker (RabbitMQ, Kafka) |
+| Reliability | In-process | Requires Outbox pattern |
+
+#### Outbox Pattern (Reliability Guarantee)
+
+The entire point: write the event in the **same DB transaction** as the state change. If the process crashes, both roll back together — nothing is lost.
+
+```csharp
+// In one transaction:
+// 1. state change persisted
+// 2. event row inserted into OutboxEvents table
+
+// Background worker (separate process/timer):
+// 3. reads pending OutboxEvents
+// 4. publishes to broker
+// 5. marks as processed
+```
+
+Without the same-transaction write, the state can change but the crash before publishing means the event is silently dropped.
+
+---
+
 ### Ubiquitous Language
 
 Use the same terms as the business domain experts, everywhere:
@@ -362,8 +446,8 @@ If the business calls it a "reservation", don't name it "booking" in the code.
 - `[b]` Domain Events
 - `[b]` Repository per aggregate root
 - `[b]` Unit of Work
-- `[~]` Bounded contexts
-- `[~]` Ubiquitous language
+- `[b]` Bounded contexts
+- `[b]` Ubiquitous language
 
 ## My Notes
 <!-- Personal notes -->

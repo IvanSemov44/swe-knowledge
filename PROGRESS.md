@@ -169,8 +169,8 @@ Update this file after every study session. Be honest.
 - `[b]` Domain Events
 - `[b]` Repository per aggregate root
 - `[b]` Unit of Work
-- `[~]` Bounded contexts
-- `[~]` Ubiquitous language
+- `[b]` Bounded contexts
+- `[b]` Ubiquitous language
 - `[b]` Rich vs Anemic domain model
 - `[b]` Backing fields (IReadOnlyCollection)
 - `[b]` Domain Events vs Integration Events
