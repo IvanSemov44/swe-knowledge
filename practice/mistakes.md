@@ -152,6 +152,14 @@ This file tracks the exact things that tripped you up — which is what intervie
 **Revisit:** mid/security-depth.md
 **Revisit by:** 2026-05-01
 
+## 2026-04-28
+**Topic:** Visitor pattern — mechanism and trade-off
+**What happened:** Got the category (behavioral) and intent (separate operations from objects) right but missed the Accept/Visit mechanism, double dispatch, and the key trade-off.
+**Root cause:** Never studied the pattern before — good intuition, no concrete knowledge.
+**Fix / key insight:** Each element has `Accept(IVisitor v)` which calls `v.Visit(this)`. The visitor has a `Visit` overload per element type. This is double dispatch — runtime resolution based on both visitor type AND element type. Trade-off: easy to add new operations (new visitor class), hard to add new element types (must update every visitor). Use when element types are stable.
+**Revisit:** mid/design-patterns.md
+**Revisit by:** 2026-05-03
+
 ## 2026-04-27
 **Topic:** React Native — FlatList virtualization
 **What happened:** Chose FlatList correctly but described off-screen items as "in a buffer."

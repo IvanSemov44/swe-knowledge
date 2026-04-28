@@ -109,6 +109,7 @@ Update this file after every study session. Be honest.
 - `[b]` Decorator
 - `[~]` Adapter
 - `[~]` Facade
+- `[~]` Visitor — Accept/Visit, double dispatch, stable elements + changing operations
 - `[ ]` Command pattern
 - `[ ]` Chain of responsibility
 
