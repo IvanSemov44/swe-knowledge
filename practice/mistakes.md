@@ -24,6 +24,30 @@ This file tracks the exact things that tripped you up — which is what intervie
 
 <!-- AI: add entries below after each session -->
 
+## 2026-04-29
+**Topic:** Semantic Search — embeddings are vectors, not scalars
+**What happened:** Said "cat = 20" as an example of a vector value. Thought embeddings were single numbers.
+**Root cause:** Conceptual — understood the idea of "meaning as a number" but not that an embedding is a high-dimensional float array (e.g. 1,536 dimensions).
+**Fix / key insight:** An embedding is `float[]` — a point in high-dimensional space. Each dimension is a float with no human-readable meaning. Two texts are similar if their vectors point in the same direction in that space.
+**Revisit:** ai-integration/rag.md
+**Revisit by:** 2026-05-03
+
+## 2026-04-29
+**Topic:** Semantic Search — query must also be embedded
+**What happened:** Described the DB lookup correctly but never mentioned that the user query itself must be passed through the embedding model first.
+**Root cause:** Thought of the query as text being "compared" to text, not as a vector being compared to vectors.
+**Fix / key insight:** The query → embedding model → query vector → cosine similarity against stored vectors. The query is NOT compared as text. Both query and documents live as vectors in the same space.
+**Revisit:** ai-integration/rag.md
+**Revisit by:** 2026-05-03
+
+## 2026-04-29
+**Topic:** RAG — the Augment step (prompt construction)
+**What happened:** Described RAG as "sending the DB result and user query to the AI." Missed that the critical step is building a structured prompt that injects retrieved chunks as context.
+**Root cause:** Understood the inputs and outputs but not the mechanism — the LLM sees a single prompt, not two separate inputs.
+**Fix / key insight:** Augment = construct a prompt like "Answer using ONLY this context: [chunks]. Question: [user query]". This is what stops the LLM from hallucinating — it's grounded to the retrieved text.
+**Revisit:** ai-integration/rag.md
+**Revisit by:** 2026-05-03
+
 ## 2026-04-09
 **Topic:** React Native — FlatList vs ScrollView
 **What happened:** Said FlatList is "more complex and heavy" — correct direction but missed the key reason: virtualization.

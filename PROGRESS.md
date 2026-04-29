@@ -392,6 +392,8 @@ Update this file after every study session. Be honest.
 - `[b]` Similarity search (cosine, dot product)
 - `[b]` Retrieval pipeline end-to-end
 - `[ ]` Re-ranking
+- `[b]` Semantic search vs keyword search — why vectors, not LIKE
+- `[b]` Same model rule — why mixing models breaks similarity
 
 ### Agentic Patterns
 - `[b]` Tool use / function calling
