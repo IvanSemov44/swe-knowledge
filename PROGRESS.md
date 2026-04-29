@@ -211,6 +211,7 @@ Update this file after every study session. Be honest.
 - `[b]` Saga basics — state machine for long-running workflows
 - `[ ]` RabbitMQ + Docker setup
 - `[b]` Projections — read-optimized tables built from events, queries read from these
+- `[b]` Full implementation — folder structure, every file, every role
 
 ### React Internals
 - `[c]` Components, props, state
