@@ -90,6 +90,120 @@ Same database, isolated schemas. When you split to microservices: each module ge
 
 ---
 
+## Repository in a BC
+
+Each BC has its own repository interface (in Application) and implementation (in Infrastructure). The repository only touches that BC's DbContext — never another module's.
+
+```csharp
+// Orders.Application — interface lives in Application layer
+public interface IOrderRepository
+{
+    Task<Order?> GetByIdAsync(Guid id, CancellationToken ct = default);
+    Task<List<Order>> GetByUserIdAsync(Guid userId, CancellationToken ct = default);
+    void Add(Order order);
+    void Update(Order order);
+}
+
+// Orders.Infrastructure — implementation lives in Infrastructure layer
+public class OrderRepository : IOrderRepository
+{
+    private readonly OrdersDbContext _context;
+
+    public OrderRepository(OrdersDbContext context) => _context = context;
+
+    public Task<Order?> GetByIdAsync(Guid id, CancellationToken ct)
+        => _context.Orders
+            .Include(o => o.Items)
+            .FirstOrDefaultAsync(o => o.Id == id, ct);
+
+    public void Add(Order order) => _context.Orders.Add(order);
+    public void Update(Order order) => _context.Orders.Update(order);
+}
+```
+
+**Rules:**
+- `OrderRepository` touches ONLY `OrdersDbContext` — never `CatalogDbContext`
+- No `SaveChangesAsync` inside the repository — that's `IUnitOfWork`'s job
+- One repository per aggregate root — `OrderRepository` for `Order`, `ProductRepository` for `Product` in Catalog
+
+---
+
+## BC Configuration (Full Module Wiring)
+
+Each BC self-registers everything it needs. The API project just calls the extension method.
+
+```csharp
+// Orders.Infrastructure/OrdersModule.cs
+public static class OrdersModule
+{
+    public static IServiceCollection AddOrdersModule(
+        this IServiceCollection services,
+        IConfiguration config)
+    {
+        // 1. DbContext with schema
+        services.AddDbContext<OrdersDbContext>(opts =>
+            opts.UseSqlServer(config.GetConnectionString("Default")));
+
+        // 2. Repositories + UnitOfWork
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        // 3. MediatR handlers (commands, queries, domain event handlers)
+        services.AddMediatR(cfg =>
+            cfg.RegisterServicesFromAssembly(typeof(PlaceOrderCommand).Assembly));
+
+        // 4. MassTransit consumers (integration event handlers for this BC)
+        services.AddMassTransit(x =>
+        {
+            x.AddConsumer<StockReservedConsumer>();
+            x.AddConsumer<StockFailedConsumer>();
+
+            x.UsingRabbitMq((ctx, cfg) =>
+            {
+                cfg.Host(config["RabbitMQ:Host"], h =>
+                {
+                    h.Username(config["RabbitMQ:Username"]);
+                    h.Password(config["RabbitMQ:Password"]);
+                });
+
+                // Retry + DLQ routing
+                cfg.ReceiveEndpoint("orders.stock-result", e =>
+                {
+                    e.ConfigureConsumer<StockReservedConsumer>(ctx);
+                    e.ConfigureConsumer<StockFailedConsumer>(ctx);
+                    e.UseMessageRetry(r => r.Intervals(
+                        TimeSpan.FromSeconds(5),
+                        TimeSpan.FromSeconds(30),
+                        TimeSpan.FromMinutes(5)));
+                });
+            });
+        });
+
+        // 5. Background worker (Outbox dispatcher)
+        services.AddHostedService<OutboxWorker>();
+
+        return services;
+    }
+}
+
+// Api/Program.cs — just wires the modules, contains no logic
+builder.Services.AddOrdersModule(builder.Configuration);
+builder.Services.AddCatalogModule(builder.Configuration);
+builder.Services.AddIdentityModule(builder.Configuration);
+```
+
+**What belongs in configuration:**
+| Item | Where registered |
+|---|---|
+| DbContext | `AddDbContext<>` in module |
+| Repositories | `AddScoped<IRepo, Impl>` in module |
+| MediatR handlers | `AddMediatR(assembly)` in module |
+| MassTransit consumers | `AddConsumer<>` + `ReceiveEndpoint` in module |
+| Background workers | `AddHostedService<>` in module |
+| Outbox/Inbox tables | Part of module's DbContext |
+
+---
+
 ## No Cross-Module EF Navigation Properties
 
 The hard rule: **no EF navigation properties crossing module boundaries.**
@@ -317,13 +431,15 @@ The modular monolith makes this extraction safe — the module's boundary is alr
 ---
 
 ## My Confidence Level
-- `[ ]` Module structure — Domain/Application/Infrastructure/Tests per module
-- `[ ]` Separate DbContext per module with schema-per-module
-- `[ ]` Module registration in Program.cs (extension methods)
-- `[ ]` Public Module API pattern (ICatalogModule)
-- `[ ]` No cross-module EF navigation properties
-- `[ ]` Separate migrations per DbContext
-- `[ ]` When to use in-process call vs integration event
+- `[b]` Module structure — Domain/Application/Infrastructure/Tests per module
+- `[b]` Separate DbContext per module with schema-per-module
+- `[b]` Module registration in Program.cs (extension methods)
+- `[b]` Public Module API pattern (ICatalogModule)
+- `[b]` No cross-module EF navigation properties
+- `[b]` Separate migrations per DbContext
+- `[b]` When to use in-process call vs integration event
+- `[b]` Repository in BC — one per aggregate root, only touches own DbContext
+- `[b]` BC configuration — full module wiring (DbContext, repos, MediatR, MassTransit, workers)
 
 ## My Notes
 <!-- Personal notes -->

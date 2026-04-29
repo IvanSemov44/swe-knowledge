@@ -281,9 +281,79 @@ Order.Place()
 
 ---
 
+## Projections
+
+A **projection** is a read-optimized, denormalized table built by consuming events. It is NOT the event response itself — it is a local copy of data a BC needs for fast reads.
+
+CQRS rule: **queries never read from the domain model**. They read from projections.
+
+```
+[Inventory BC]
+  StockReservedIntegrationEvent published to RabbitMQ
+    ↓
+[Ordering BC] StockStatusConsumer
+  → writes into StockStatusProjection table
+    (OrderId, ProductId, Reserved: true, ReservedAt)
+    ↓
+GetOrderStockStatusQuery reads from StockStatusProjection (fast, no joins)
+```
+
+```csharp
+// Projection table — flat, denormalized, query-optimized
+public class StockStatusProjection
+{
+    public Guid OrderId { get; set; }
+    public Guid ProductId { get; set; }
+    public bool IsReserved { get; set; }
+    public DateTime? ReservedAt { get; set; }
+}
+
+// Consumer that builds/updates the projection
+public class StockReservedConsumer : IConsumer<StockReservedIntegrationEvent>
+{
+    private readonly OrdersDbContext _context;
+
+    public async Task Consume(ConsumeContext<StockReservedIntegrationEvent> ctx)
+    {
+        var projection = await _context.StockStatuses
+            .FirstOrDefaultAsync(s => s.OrderId == ctx.Message.OrderId);
+
+        if (projection is null)
+        {
+            projection = new StockStatusProjection { OrderId = ctx.Message.OrderId };
+            _context.StockStatuses.Add(projection);
+        }
+
+        projection.IsReserved = true;
+        projection.ReservedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync(ctx.CancellationToken);
+    }
+}
+
+// Query handler reads from projection — no domain model, no joins
+public class GetOrderStockStatusQueryHandler
+    : IRequestHandler<GetOrderStockStatusQuery, StockStatusDto?>
+{
+    public async Task<StockStatusDto?> Handle(GetOrderStockStatusQuery q, CancellationToken ct)
+        => await _context.StockStatuses
+            .AsNoTracking()
+            .Where(s => s.OrderId == q.OrderId)
+            .Select(s => new StockStatusDto(s.OrderId, s.IsReserved, s.ReservedAt))
+            .FirstOrDefaultAsync(ct);
+}
+```
+
+**Key rule:** a projection is always rebuilt from events. If it gets corrupted or out of date, you replay the events to rebuild it.
+
+---
+
 ## Retry and Dead Letter Queue
 
-MassTransit handles retries automatically:
+**DLQ is a RabbitMQ queue — not a database table.**
+
+When a consumer fails after all retries, RabbitMQ routes the message to a dead letter exchange, which delivers it to a dead letter queue. You inspect it in the RabbitMQ Management UI at `http://localhost:15672`.
+
+MassTransit handles retries and DLQ automatically:
 
 ```csharp
 cfg.ReceiveEndpoint("order-placed", e =>
@@ -298,7 +368,12 @@ cfg.ReceiveEndpoint("order-placed", e =>
 });
 ```
 
-After all retries fail → message goes to Dead Letter Queue (`order-placed_error` in RabbitMQ). You can inspect it in the RabbitMQ Management UI (`http://localhost:15672`) and replay.
+```
+Normal queue:   order-placed          ← consumer reads here
+DLQ:            order-placed_error    ← auto-routed after all retries fail
+```
+
+In the RabbitMQ UI you can see the failed message, its error, and replay it once the bug is fixed. MassTransit also writes error details to a `_skipped` queue for messages that can't be deserialized.
 
 ---
 
@@ -389,14 +464,15 @@ Saga state is persisted to the `SagaState` table — survives restarts.
 ---
 
 ## My Confidence Level
-- `[ ]` Full event flow — domain event → outbox → RabbitMQ → consumer → inbox
-- `[ ]` Outbox pattern — manual implementation
+- `[b]` Full event flow — domain event → outbox → RabbitMQ → consumer → inbox
+- `[b]` Outbox pattern — manual implementation
 - `[ ]` MassTransit built-in Outbox setup
-- `[ ]` Inbox pattern — idempotent consumer
-- `[ ]` Dead Letter Queue — configuration and monitoring
+- `[b]` Inbox pattern — idempotent consumer
+- `[b]` Dead Letter Queue — RabbitMQ queue (not DB table), auto-routed on retry exhaustion
 - `[ ]` MassTransit consumer setup
-- `[ ]` Saga basics — state machine for long-running workflows
+- `[b]` Saga basics — state machine for long-running workflows
 - `[ ]` RabbitMQ + Docker setup
+- `[b]` Projections — read-optimized tables built from events, queries read from these
 
 ## My Notes
 <!-- Personal notes -->

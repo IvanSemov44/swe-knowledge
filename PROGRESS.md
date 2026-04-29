@@ -191,6 +191,8 @@ Update this file after every study session. Be honest.
 - `[b]` No cross-module EF navigation properties
 - `[b]` Separate migrations per DbContext
 - `[b]` When to use in-process call vs integration event
+- `[b]` Repository in BC — one per aggregate root, only touches own DbContext
+- `[b]` BC configuration — full module wiring (DbContext, repos, MediatR, MassTransit, workers)
 
 ### CQRS + MediatR
 - `[b]` Command vs Query separation
@@ -204,10 +206,11 @@ Update this file after every study session. Be honest.
 - `[b]` Outbox pattern — manual implementation
 - `[ ]` MassTransit built-in Outbox setup
 - `[b]` Inbox pattern — idempotent consumer
-- `[b]` Dead Letter Queue — configuration and monitoring
+- `[b]` Dead Letter Queue — RabbitMQ queue (not DB table), auto-routed on retry exhaustion
 - `[ ]` MassTransit consumer setup
 - `[b]` Saga basics — state machine for long-running workflows
 - `[ ]` RabbitMQ + Docker setup
+- `[b]` Projections — read-optimized tables built from events, queries read from these
 
 ### React Internals
 - `[c]` Components, props, state

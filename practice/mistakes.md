@@ -24,6 +24,22 @@ This file tracks the exact things that tripped you up — which is what intervie
 
 <!-- AI: add entries below after each session -->
 
+## 2026-04-29
+**Topic:** Event-Driven — DLQ is a RabbitMQ queue, not a DB table
+**What happened:** Described DLQ as a "table where unprocessed events stay with errors."
+**Root cause:** Knows the purpose of DLQ but visualized it as a DB concept. DLQ is a broker-side queue, not something in your database.
+**Fix / key insight:** DLQ lives in RabbitMQ (`order-placed_error`). After all retries fail, RabbitMQ routes the message there automatically. You inspect and replay via the RabbitMQ Management UI at `:15672`. No DB table involved — unless you build a custom monitoring layer on top.
+**Revisit:** mid/event-driven-flow.md
+**Revisit by:** 2026-05-04
+
+## 2026-04-29
+**Topic:** CQRS/DDD — Projection definition
+**What happened:** Described projection as "the table where Inventory sends back data" — conflated a projection with an integration event response.
+**Root cause:** Didn't have a clean mental model of what a projection IS. A projection is a read model built from events — not the event itself or the response channel.
+**Fix / key insight:** Projection = a denormalized, read-optimized table built by consuming events. Queries ONLY read from projections, never from the domain model. When a `StockReservedEvent` arrives, the consumer writes into a `StockStatusProjection` table. The query later reads from that table fast, with no joins.
+**Revisit:** mid/event-driven-flow.md
+**Revisit by:** 2026-05-04
+
 ## 2026-04-28
 **Topic:** DDD — Integration Events vs Domain Events
 **What happened:** Answered "outbox pattern" for both parts of the question — named the reliability mechanism but didn't name the cross-BC communication pattern (Integration Event) at all.
