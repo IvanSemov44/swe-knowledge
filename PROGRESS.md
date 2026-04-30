@@ -257,6 +257,18 @@ Update this file after every study session. Be honest.
 - `[b]` persist middleware
 - `[b]` Zustand vs Redux Toolkit — when to choose which
 
+### State Management — Landscape
+- `[ ]` Server state vs client/UI state — the fundamental split (server state = TanStack Query / RTK Query; UI state = Zustand / Context / Redux)
+- `[ ]` TanStack Query (React Query v5) — `useQuery`, `useMutation`, `QueryClient`, stale-while-revalidate, `invalidateQueries`
+- `[ ]` TanStack Query vs RTK Query — when to choose each (project coupling, backend ownership)
+- `[ ]` SWR — Vercel's data fetching; `useSWR`, `mutate`, revalidation strategies; lighter than TanStack Query
+- `[ ]` Jotai — atomic state model; `atom()`, `useAtom`; bottom-up composition; no store singleton
+- `[ ]` Jotai vs Zustand — atoms vs slices; when atomic model wins
+- `[ ]` MobX — observable/computed/action; reactive model; good for complex derived state
+- `[ ]` XState (v5) — explicit state machines + statecharts; `createMachine`, `useMachine`; when state has complex transitions
+- `[ ]` Context API limits — why Context is not a state manager (no selectors, rerenders on every value change)
+- `[ ]` State management decision matrix — server state / shared UI state / local component state / URL state
+
 ### React Patterns
 - `[b]` Error Boundaries — when to use, what they don't catch
 - `[b]` HOC — implement one, explain tradeoffs
@@ -703,9 +715,21 @@ Update this file after every study session. Be honest.
 - `[c]` useState, useEffect, useRef
 - `[c]` Custom hooks
 - `[b]` Context API
-- `[b]` React Router
 - `[b]` Forms (controlled vs uncontrolled)
 - `[~]` Performance (memo, lazy, Suspense)
+
+### React Router v6/v7
+- `[ ]` `createBrowserRouter` — data router API; replaces `<BrowserRouter>` + JSX route config
+- `[ ]` Loaders — `loader` function fetches data before render; `useLoaderData()` to consume
+- `[ ]` Actions — `action` function handles form POST; `useActionData()` for result
+- `[ ]` Nested routes — `<Outlet>` for layout composition; shared layouts with child routes
+- `[ ]` Error boundaries per route — `errorElement` prop; `useRouteError()`
+- `[ ]` `<Form>` component — progressive enhancement; works without JS
+- `[ ]` `useNavigate`, `useParams`, `useSearchParams`, `useLocation`
+- `[ ]` Protected routes — wrapper component that checks auth and redirects
+- `[ ]` Lazy routes — `lazy: () => import('./Page')` for code splitting per route
+- `[ ]` TanStack Router — fully type-safe routing; `createRoute`, `Link` with typed params; alternative to React Router
+- `[ ]` React Router vs TanStack Router vs Next.js App Router — trade-offs and when to choose
 
 ### React 19
 - `[ ]` React Compiler — auto-memoizes; when manual `memo`/`useMemo`/`useCallback` is still needed
@@ -739,22 +763,67 @@ Update this file after every study session. Be honest.
 - `[ ]` Generic components
 - `[ ]` forwardRef typing
 
+### React Ecosystem Libraries
+- `[ ]` Radix UI — unstyled, accessible headless components (Dialog, Popover, Select, Tooltip); bring your own styles
+- `[ ]` shadcn/ui — Radix + Tailwind prebuilt; copy-paste components into your project, not a dependency
+- `[ ]` Headless UI (Tailwind Labs) — alternative headless library; Listbox, Combobox, Disclosure
+- `[ ]` Framer Motion — declarative animation; `motion.div`, `AnimatePresence`, layout animations, gestures
+- `[ ]` React Spring — physics-based animations; spring model; better for interactive/gesture-driven animations
+- `[ ]` TanStack Table (v8) — headless table; sorting, filtering, pagination, grouping; bring your own UI
+- `[ ]` TanStack Virtual — virtual scrolling for large lists/grids without rendering all rows in DOM
+- `[ ]` dnd-kit — drag and drop; sortable lists, multiple containers; accessibility-first
+- `[ ]` React Hot Toast / Sonner — toast notifications; simple API, accessible
+- `[ ]` React Hook Form (already tracked under React Forms)
+- `[ ]` Storybook — component workshop; `stories` per component; visual regression with Chromatic
+- `[ ]` Vitest — Jest-compatible unit test runner built on Vite; faster than Jest in Vite projects
+- `[ ]` Playwright — E2E browser testing; multi-browser, trace viewer, CI screenshots
+- `[ ]` Cypress — E2E + component testing; time-travel debugger; good for visual component tests
+- `[ ]` MSW (Mock Service Worker) — intercepts fetch/XHR at Service Worker level; same mocks in tests + dev
+- `[ ]` date-fns / Day.js — date manipulation; tree-shakable (date-fns) vs chainable (Day.js); alternatives to Moment
+- `[ ]` Zod (already tracked under React Forms)
+
 ### React Native
-- `[b]` Core components (View, Text, ScrollView, FlatList)
-- `[b]` StyleSheet
-- `[b]` Navigation (React Navigation)
+- `[b]` Core components (View, Text, ScrollView, FlatList, SectionList)
+- `[b]` StyleSheet — style objects, platform-specific values
+- `[b]` Navigation (React Navigation) — Stack, Tab, Drawer navigators; deep linking
 - `[~]` WatermelonDB (offline-first)
-- `[ ]` Native modules
-- `[ ]` Performance profiling
+- `[ ]` Expo vs bare workflow — Expo SDK modules vs ejected; when to eject
+- `[ ]` Expo Router — file-based routing for RN; same conventions as Next.js App Router
+- `[ ]` EAS Build — cloud builds for iOS + Android without local Xcode/Android Studio
+- `[ ]` EAS Submit — automated app store submission
+- `[ ]` EAS Update (OTA) — over-the-air JS bundle updates without app store review
+- `[ ]` Platform-specific code — `Platform.OS`, `Platform.select()`, `.ios.tsx` / `.android.tsx` file suffixes
+- `[ ]` React Native Reanimated v3 — JS-thread-free animations; `useSharedValue`, `useAnimatedStyle`, `withSpring`
+- `[ ]` React Native Gesture Handler — native gesture recognition; replaces `TouchableOpacity` for complex gestures
+- `[ ]` Hermes JS engine — bytecode compilation at build time; faster startup, lower memory
+- `[ ]` Metro bundler — RN's bundler; configuration, aliases, custom transformers
+- `[ ]` MMKV — fast key-value storage (replaces AsyncStorage for simple data; 30× faster)
+- `[ ]` Push notifications — Expo Notifications + Firebase Cloud Messaging (FCM)
+- `[ ]` Linking / deep links — `expo-linking`, universal links (iOS), app links (Android)
+- `[ ]` React Native Paper / NativeWind / Tamagui — UI libraries for RN; styling trade-offs
+- `[ ]` Testing — Jest + React Native Testing Library; mocking native modules
+- `[ ]` Performance profiling — Flipper, React DevTools standalone, Hermes profiler
 
 ### Next.js
-- `[ ]` SSR vs SSG vs ISR vs CSR — trade-offs and use cases
-- `[ ]` App Router — directory structure (layout, page, loading, error)
-- `[ ]` Server Components vs Client Components — rules, constraints
-- `[ ]` Data fetching in Server Components
-- `[ ]` Route Handlers (API routes in App Router)
-- `[ ]` Middleware — auth checks, redirects
-- `[ ]` Next.js vs Vite + React — when to choose which
+- `[ ]` SSR vs SSG vs ISR vs CSR — trade-offs and use cases; when each is the right default
+- `[ ]` App Router — file-system conventions: `layout.tsx`, `page.tsx`, `loading.tsx`, `error.tsx`, `not-found.tsx`
+- `[ ]` Server Components vs Client Components — rules: no hooks/events in SC; `"use client"` boundary
+- `[ ]` Data fetching in Server Components — `fetch()` with Next.js cache extensions (`{ cache: 'force-cache' }`)
+- `[ ]` Next.js caching model — 4 layers: Request Memoization, Data Cache, Full Route Cache, Router Cache
+- `[ ]` `revalidatePath` and `revalidateTag` — on-demand cache invalidation from Server Actions or Route Handlers
+- `[ ]` `unstable_cache` — cache arbitrary async functions with tags; Next.js 14+
+- `[ ]` Streaming SSR — `loading.tsx` as Suspense boundary; `<Suspense>` wrapping slow data components
+- `[ ]` Parallel routes — `@slot` folders; show multiple pages simultaneously in one layout
+- `[ ]` Intercepting routes — `(.)` / `(..)` prefix; modal pattern (show photo in modal, full page on direct nav)
+- `[ ]` Route Handlers — `route.ts`; GET/POST handlers replacing `pages/api`; replaces Express for simple APIs
+- `[ ]` Server Actions — `"use server"` functions; form POST without writing an API route
+- `[ ]` `next/image` — automatic WebP/AVIF conversion, lazy loading, layout shift prevention, remote domains config
+- `[ ]` `next/font` — self-hosted Google Fonts + local fonts; zero layout shift, no external request
+- `[ ]` Metadata API — `export const metadata` in `layout.tsx` / `page.tsx`; dynamic with `generateMetadata()`
+- `[ ]` `generateStaticParams` — pre-render dynamic routes at build time (`[id]` → known IDs)
+- `[ ]` Middleware — `middleware.ts` at root; runs on Edge runtime; auth checks, redirects, locale detection
+- `[ ]` Next.js 15 changes — async `cookies()` / `headers()` / `params`; PPR (Partial Pre-Rendering); Turbopack stable
+- `[ ]` Next.js vs Vite + React — when each is right; Next.js overhead vs Vite simplicity
 
 ### Web Platform APIs
 - `[ ]` Service Workers — install/activate/fetch lifecycle; cache-first vs network-first vs stale-while-revalidate
