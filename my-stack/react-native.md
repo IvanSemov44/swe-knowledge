@@ -1,4 +1,5 @@
 # React Native Deep Dive
+<!-- level: Mid (beginner for Ivan) | View, Text, FlatList, navigation, StyleSheet, WatermelonDB -->
 
 <!-- last-reviewed: 2026-04-09 | next-review: 2026-05-09 | confidence: b -->
 

@@ -1,5 +1,7 @@
 # C# Exception Handling & ProblemDetails
 
+<!-- level: Mid | throw vs Result<T>, global exception handler, ProblemDetails (RFC 7807) -->
+
 ## What it is
 How .NET handles errors at runtime: the exception hierarchy, when to throw vs return `Result<T>`, and how to expose consistent error responses from an ASP.NET Core API using ProblemDetails (RFC 7807).
 

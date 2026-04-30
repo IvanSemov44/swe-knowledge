@@ -1,5 +1,7 @@
 # Next.js
 
+<!-- level: Mid | SSR/SSG/ISR, App Router, Server Components, route handlers, middleware -->
+
 ## What it is
 A React framework that adds server-side rendering, static generation, file-based routing, and a full-stack API layer on top of React. Built by Vercel.
 

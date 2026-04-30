@@ -1,5 +1,7 @@
 # Background Jobs in .NET
 
+<!-- level: Mid | IHostedService, BackgroundService, Channel<T>, graceful shutdown, Hangfire -->
+
 ## What it is
 Work that runs outside the HTTP request cycle — scheduled tasks, queue consumers, cleanup jobs. .NET provides `IHostedService` and `BackgroundService`. Hangfire adds a persistent job queue with a dashboard.
 

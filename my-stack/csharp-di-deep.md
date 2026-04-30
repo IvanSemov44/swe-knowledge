@@ -1,5 +1,7 @@
 # Dependency Injection — Deep Dive
 
+<!-- level: Mid | captive dependency, IServiceScopeFactory, Options pattern, keyed services -->
+
 ## What it is
 .NET's built-in DI container manages object lifetimes and resolves dependencies. Beyond the basics, there are subtle bugs (captive dependency), advanced patterns (named services, IServiceScopeFactory), and the Options pattern for configuration.
 

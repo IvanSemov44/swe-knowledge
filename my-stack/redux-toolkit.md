@@ -1,5 +1,7 @@
 # Redux Toolkit Deep Dive
 
+<!-- level: Mid | slices, selectors, createAsyncThunk, RTK Query, DevTools -->
+
 ## What it is
 Redux Toolkit (RTK) is the official, opinionated toolset for Redux. It eliminates boilerplate (no more action type constants, switch reducers, spread hell) while keeping Redux's predictable state model.
 

@@ -1,5 +1,7 @@
 # C# Nullable Reference Types & Null Handling
 
+<!-- level: Junior → Mid | nullable value types, nullable refs, null operators, required members -->
+
 ## What it is
 C# has two null systems: **nullable value types** (`int?`) which have existed since C# 2, and **nullable reference types** (C# 8+) which make the compiler warn you when you might dereference null.
 

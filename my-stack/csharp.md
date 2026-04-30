@@ -1,5 +1,6 @@
 # C# Deep Dive
 
+<!-- level: Junior → Mid | OOP, async/await, LINQ, generics, delegates, IDisposable -->
 ## What it is
 My primary backend language. C# is a statically typed, object-oriented language running on the .NET runtime (CLR). It's feature-rich, modern, and has excellent async support.
 

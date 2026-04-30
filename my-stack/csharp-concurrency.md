@@ -1,5 +1,7 @@
 # C# Concurrency & Thread Safety
 
+<!-- level: Mid → Senior | lock, SemaphoreSlim, async pitfalls, CancellationToken, concurrent collections -->
+
 ## What it is
 Managing multiple operations executing simultaneously. In .NET this covers threads, the thread pool, async/await mechanics, shared state protection, and safe patterns for concurrent code.
 

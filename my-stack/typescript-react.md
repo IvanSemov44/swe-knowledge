@@ -1,5 +1,7 @@
 # TypeScript with React
 
+<!-- level: Mid | typing props, events, hooks, context, generic components, forwardRef -->
+
 ## What it is
 How to type React-specific patterns: component props, events, refs, hooks, context, and generics in JSX. TypeScript + React together have their own idioms that differ from plain TypeScript.
 

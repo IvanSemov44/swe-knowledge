@@ -1,5 +1,7 @@
 # C# Memory Management & Garbage Collection
 
+<!-- level: Senior | GC generations, boxing/unboxing, Span<T>, ArrayPool, WeakReference -->
+
 ## What it is
 How .NET allocates and reclaims memory automatically via the Garbage Collector (GC), and how you write code that works with it rather than against it.
 

@@ -1,5 +1,7 @@
 # TypeScript Advanced Types
 
+<!-- level: Mid | utility types, discriminated unions, mapped types, conditional types, infer -->
+
 ## What it is
 TypeScript's type system beyond the basics. These features let you express complex type relationships, write generic utilities, and make impossible states unrepresentable at compile time.
 

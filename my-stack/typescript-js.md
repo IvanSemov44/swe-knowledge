@@ -1,4 +1,5 @@
 # TypeScript / JavaScript Deep Dive
+<!-- level: Junior → Mid | closures, event loop, Promises, prototype chain, Promise combinators -->
 
 <!-- last-reviewed: 2026-04-09 | next-review: 2026-05-09 | confidence: c -->
 

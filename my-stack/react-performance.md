@@ -1,5 +1,7 @@
 # React Performance
 
+<!-- level: Mid | memo, useMemo, useCallback, stale closures, lazy, Profiler -->
+
 ## What it is
 Understanding when and why React re-renders, and the tools to prevent unnecessary renders: `React.memo`, `useMemo`, `useCallback`, lazy loading, and the React Profiler.
 

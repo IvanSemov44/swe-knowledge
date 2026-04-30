@@ -910,102 +910,108 @@ app.UseResponseCompression(); // in middleware pipeline
 
 ## Full API Knowledge Map
 
+Level key: `[J]` Junior · `[M]` Mid · `[S]` Senior
+
 ```
 API Knowledge
 │
-├── Security
-│   ├── JWT validation setup                    [b]
-│   ├── Role-based + policy-based authorization [ ]
-│   ├── PKCE + refresh token rotation           [ ]
-│   ├── CORS, CSRF, XSS, security headers       [b] (security-depth.md)
-│   ├── OWASP API Security Top 10               [ ]
-│   └── Rate limiting (built-in + Redis)        [ ]
+├── ══ JUNIOR ═══════════════════════════════════════════════════
+│   ├── HTTP verbs, status codes, REST             [J] http-rest.md
+│   ├── Controllers, routing, model binding        [J] aspnet.md
+│   ├── [FromBody] / [FromQuery] / [FromRoute]     [J]
+│   ├── Swagger / OpenAPI documentation            [J]
+│   ├── ProblemDetails — what it looks like        [J]
+│   ├── ValidationProblemDetails vs ProblemDetails [J]
+│   ├── IFormFile upload + FileStreamResult        [J]
+│   ├── PATCH vs PUT semantics                     [J]
+│   └── Content negotiation + model binding        [J]
 │
-├── Middleware Pipeline
-│   ├── Correct 9-step order                    [ ]
-│   ├── Custom middleware (IMiddleware)          [b]
-│   └── Short-circuit patterns                  [ ]
+├── ══ MID ══════════════════════════════════════════════════════
+│   │
+│   ├── Security
+│   │   ├── JWT validation setup                   [M] authentication.md
+│   │   ├── Role-based + policy-based authz        [M]
+│   │   ├── PKCE + refresh token rotation          [M]
+│   │   ├── CORS, CSRF, XSS, security headers      [M] security-depth.md
+│   │   ├── OWASP API Security Top 10 (BOLA etc.)  [M]
+│   │   └── Rate limiting — .NET 8 built-in        [M]
+│   │
+│   ├── Middleware Pipeline
+│   │   ├── Correct 9-step order                   [M]
+│   │   └── Custom middleware (IMiddleware)         [M] [b]
+│   │
+│   ├── API Design
+│   │   ├── API versioning (URL / header)           [M]
+│   │   ├── Pagination + PagedResult<T>             [M]
+│   │   ├── Filtering + sorting on list endpoints   [M]
+│   │   ├── Idempotency keys on POST                [M]
+│   │   ├── 202 Accepted + job polling              [M]
+│   │   └── Webhooks — send + receive + HMAC        [M]
+│   │
+│   ├── Caching
+│   │   ├── IMemoryCache (single instance)          [M]
+│   │   ├── IDistributedCache → Redis               [M] [b]
+│   │   ├── Output caching (.NET 8)                 [M]
+│   │   └── ETag + Cache-Control headers            [M]
+│   │
+│   ├── HTTP Clients
+│   │   ├── IHttpClientFactory — typed + named      [M]
+│   │   └── Polly + IHttpClientFactory wiring       [M]
+│   │
+│   ├── Real-Time
+│   │   ├── SignalR (bi-directional)                [M]
+│   │   └── SSE (server push only)                  [M]
+│   │
+│   ├── Streaming
+│   │   └── IAsyncEnumerable<T> large responses     [M]
+│   │
+│   ├── Background Work
+│   │   ├── BackgroundService                        [M] [b]
+│   │   ├── Channel<T> (in-process queue)           [M]
+│   │   └── Hangfire (persistent scheduled jobs)    [M]
+│   │
+│   ├── Configuration
+│   │   ├── Options pattern (IOptions variants)     [M]
+│   │   ├── ValidateOnStart — fail fast             [M]
+│   │   └── Secrets management                      [M]
+│   │
+│   ├── DI Advanced
+│   │   ├── Keyed services (.NET 8)                 [M]
+│   │   ├── Decorator pattern (Scrutor)             [M]
+│   │   └── DateTime vs DateTimeOffset              [M]
+│   │
+│   ├── Feature Flags
+│   │   └── Microsoft.FeatureManagement             [M]
+│   │
+│   ├── Minimal APIs
+│   │   ├── Route handlers vs controllers           [M]
+│   │   └── IEndpointFilter                         [M]
+│   │
+│   ├── Performance
+│   │   ├── System.Text.Json configuration          [M]
+│   │   └── Connection + DbContext pooling          [M]
+│   │
+│   └── Testing
+│       ├── Unit (xUnit + Moq)                      [M] [b]
+│       ├── Integration (Testcontainers)            [M] [b]
+│       └── WebApplicationFactory (API layer)       [M]
 │
-├── API Design
-│   ├── Versioning (URL / header)               [ ]
-│   ├── Pagination + PagedResult<T>             [ ]
-│   ├── Filtering + sorting on list endpoints   [ ]
-│   ├── Idempotency keys on POST                [ ]
-│   ├── 202 Accepted + job polling pattern      [ ]
-│   ├── PATCH vs PUT semantics                  [ ]
-│   ├── Webhooks — send + receive + HMAC        [ ]
-│   ├── Content negotiation + model binding     [ ]
-│   ├── ValidationProblemDetails vs ProblemDetails [ ]
-│   └── Swagger / OpenAPI documentation        [ ]
-│
-├── Caching
-│   ├── IMemoryCache (single instance)          [ ]
-│   ├── IDistributedCache → Redis               [b] (system design)
-│   ├── Output caching (.NET 8)                 [ ]
-│   └── ETag + Cache-Control                    [ ]
-│
-├── HTTP Clients
-│   ├── IHttpClientFactory — typed + named      [ ]
-│   └── Polly + IHttpClientFactory              [ ]
-│
-├── File Handling
-│   ├── IFormFile upload → IBlobService         [ ]
-│   └── FileStreamResult download               [ ]
-│
-├── Real-Time
-│   ├── SignalR (bi-directional)                [ ]
-│   └── SSE (server push only)                  [ ]
-│
-├── Streaming
-│   └── IAsyncEnumerable<T> large responses     [ ]
-│
-├── Background Work
-│   ├── BackgroundService                        [b]
-│   ├── Channel<T> (in-process queue)           [ ]
-│   └── Hangfire (persistent scheduled jobs)    [ ]
-│
-├── Configuration
-│   ├── Options pattern (IOptions variants)     [ ]
-│   ├── ValidateOnStart — fail fast             [ ]
-│   └── Secrets management                      [ ]
-│
-├── DI Advanced
-│   ├── Keyed services (.NET 8)                 [ ]
-│   ├── Decorator pattern (Scrutor)             [ ]
-│   └── DateTime vs DateTimeOffset              [ ]
-│
-├── Multi-Tenancy
-│   ├── Tenant resolution strategies            [ ]
-│   └── Global Query Filter per tenant          [ ]
-│
-├── Feature Flags
-│   └── Microsoft.FeatureManagement             [ ]
-│
-├── Minimal APIs
-│   ├── Route handlers vs controllers           [ ]
-│   └── IEndpointFilter                         [ ]
-│
-├── Performance
-│   ├── System.Text.Json options                [ ]
-│   └── Connection + DbContext pooling          [ ]
-│
-├── Testing
-│   ├── Unit (xUnit + Moq)                      [b]
-│   ├── Integration (Testcontainers)            [b]
-│   └── API layer (WebApplicationFactory)       [ ]
-│
-├── Observability
-│   ├── Structured logging (Serilog)             [b]
-│   ├── Correlation ID                           [b]
-│   ├── Health checks                            [b]
-│   ├── OpenTelemetry — distributed tracing      [ ]
-│   └── Metrics (p99, error rate, request rate)  [ ]
-│
-└── Deployment
-    ├── Graceful shutdown                        [ ]
-    ├── Response compression                     [ ]
-    ├── Docker + health check                    [b]
-    └── Environment config                       [b]
+└── ══ SENIOR ════════════════════════════════════════════════════
+    ├── Multi-Tenancy at scale                       [S]
+    │   ├── Tenant resolution strategies
+    │   └── Global Query Filter per tenant
+    ├── Distributed rate limiting (Redis-backed)     [S]
+    ├── Observability
+    │   ├── Structured logging (Serilog)             [S] [b]
+    │   ├── Correlation ID                           [S] [b]
+    │   ├── Health checks                            [S] [b]
+    │   ├── OpenTelemetry — spans + exporters        [S] observability.md
+    │   └── Metrics (p99, error rate, request rate)  [S]
+    └── Deployment
+        ├── Graceful shutdown + HostOptions          [S]
+        ├── Response compression                     [S]
+        ├── Docker + health check                    [S] [b]
+        └── Zero-downtime deploys (blue/green)       [S] ci-cd.md
 ```
 
 ---

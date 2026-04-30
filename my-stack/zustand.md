@@ -1,5 +1,7 @@
 # Zustand Deep Dive
 
+<!-- level: Mid | create(), useShallow, persist middleware, Zustand vs Redux -->
+
 ## What it is
 Zustand is a minimal, unopinionated state management library for React. No boilerplate, no providers, no actions/reducers — just a store as a hook.
 

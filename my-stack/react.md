@@ -1,5 +1,7 @@
 # React Deep Dive
 
+<!-- level: Junior → Mid | hooks, context API, routing, controlled forms, custom hooks -->
+
 ## What it is
 A JavaScript library for building user interfaces through composable components. React manages a virtual DOM and efficiently updates the real DOM when state changes.
 
