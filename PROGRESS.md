@@ -499,11 +499,28 @@ Update this file after every study session. Be honest.
 ### ASP.NET Core
 - `[c]` Controllers, routing, model binding
 - `[b]` Middleware pipeline
+- `[b]` Middleware pipeline order — exception → HTTPS → CORS → rate → auth → authz → compress → route
 - `[b]` Dependency Injection (lifetimes: Singleton/Scoped/Transient)
 - `[b]` Filters (action, exception, validation)
 - `[b]` Configuration (appsettings, environment)
 - `[~]` Minimal APIs
 - `[ ]` SignalR
+- `[ ]` API versioning (Asp.Versioning.Http)
+- `[ ]` Pagination — PagedResult<T>, offset vs keyset
+- `[ ]` Rate limiting — built-in .NET 8 + Redis distributed
+- `[ ]` Output caching — .NET 8 built-in
+- `[ ]` IMemoryCache + IDistributedCache usage pattern
+- `[ ]` ETag + Cache-Control headers
+- `[ ]` Idempotency key filter pattern
+- `[ ]` IFormFile upload + FileStreamResult download
+- `[ ]` WebApplicationFactory — API layer integration tests
+- `[ ]` Channel<T> — in-process producer/consumer queue
+- `[ ]` Hangfire — persistent scheduled jobs
+- `[ ]` Graceful shutdown — HostOptions + CancellationToken
+- `[ ]` Response compression — gzip + brotli
+- `[ ]` Role-based + policy-based authorization
+- `[ ]` Options pattern — IOptions vs IOptionsSnapshot vs IOptionsMonitor
+- `[ ]` ValidateOnStart — fail fast on bad config
 
 ### React
 - `[c]` JSX, components, props
