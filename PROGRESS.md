@@ -95,6 +95,17 @@ Update this file after every study session. Be honest.
 - `[ ]` Story points, velocity, Definition of Done
 - `[ ]` Scrum vs Kanban
 
+### Computer Science Fundamentals
+- `[ ]` Processes vs threads — creation cost, context switching, shared memory
+- `[ ]` Virtual memory — pages, page faults, address space layout, stack vs heap segments
+- `[ ]` File descriptors — everything is a file (socket, pipe, disk); open/close lifecycle
+- `[ ]` OSI model — 7 layers; practical focus: L3 IP, L4 TCP/UDP, L7 HTTP/TLS
+- `[ ]` TCP — 3-way handshake, reliable delivery, flow control, congestion control (Nagle's algorithm)
+- `[ ]` UDP — why faster (no handshake, no retransmit); used in DNS, video streaming, gaming
+- `[ ]` DNS — recursive resolver → root → TLD → authoritative; TTL; record types (A, CNAME, MX, TXT)
+- `[ ]` CDN — edge PoPs, origin shield, cache-hit ratio, cache invalidation strategies
+- `[ ]` Load balancer — L4 (TCP) vs L7 (HTTP); round-robin, least-connections, IP hash, sticky sessions
+
 ---
 
 ## MID LEVEL
@@ -301,6 +312,29 @@ Update this file after every study session. Be honest.
 - `[ ]` RTL queries — getBy vs queryBy vs findBy, role-first approach
 - `[ ]` Testing async components with RTL + MSW
 
+### Event Sourcing
+- `[ ]` Append-only event log — events are immutable facts; state is derived, never stored directly
+- `[ ]` Rebuilding current state from event replay
+- `[ ]` Snapshots — when to use (high event count); stored alongside events, not instead of them
+- `[ ]` Event versioning — upcasters for backwards-compatible schema evolution
+- `[ ]` CQRS + Event Sourcing as a natural pair — command writes event, read side projects
+- `[ ]` EventStoreDB vs Postgres as event store — trade-offs
+- `[ ]` When NOT to use Event Sourcing — simple CRUD, reporting-heavy, no audit requirement
+
+### Architecture Patterns
+- `[ ]` Hexagonal Architecture (Ports and Adapters) — primary ports (driving), secondary ports (driven), adapters
+- `[ ]` Hexagonal vs Clean Architecture — same idea, different vocabulary; compare trade-offs
+- `[ ]` Context Mapping — ACL, Conformist, Partnership, Shared Kernel, Customer/Supplier, Published Language
+- `[ ]` Strangler Fig pattern — incrementally replace a monolith feature by feature
+- `[ ]` Architecture Decision Records (ADRs) — format (title/status/context/decision/consequences), where to store
+
+### Performance Engineering
+- `[ ]` BenchmarkDotNet — `[Benchmark]`, `[MemoryDiagnoser]`; reading Mean, Allocated columns
+- `[ ]` dotTrace — CPU Timeline mode vs Sampling; identifying hot paths and lock contention
+- `[ ]` dotMemory — heap snapshots, retained vs shallow size, allocation tracking in unit tests
+- `[ ]` `System.IO.Pipelines` — `PipeReader`/`PipeWriter`; backpressure, memory reuse, zero-copy parsing
+- `[ ]` Allocation-free patterns — struct enumerators, `ArrayPool`, `Span<T>` slicing, avoiding LINQ allocations
+
 ---
 
 ## SENIOR LEVEL
@@ -380,6 +414,71 @@ Update this file after every study session. Be honest.
 - `[ ]` Basic kubectl commands
 - `[ ]` Docker Compose for local dev vs K8s for production
 
+### Distributed Systems Theory
+- `[ ]` CAP theorem — deep: Consistency vs Availability under Partition; CP (Zookeeper, HBase) vs AP (Cassandra, DynamoDB) in real systems
+- `[ ]` BASE — Basically Available, Soft state, Eventually consistent; contrast with ACID
+- `[ ]` Eventual consistency patterns — read-your-writes, monotonic reads, causal consistency, session guarantees
+- `[ ]` Two-Phase Commit (2PC) — coordinator/participant protocol; blocking problem; why distributed systems avoid it
+- `[ ]` Saga vs 2PC — compensating transactions; choreography (events) vs orchestration (state machine)
+- `[ ]` Idempotency at scale — natural keys, deduplication windows, outbox uniqueness, at-least-once delivery guarantee
+- `[ ]` Vector clocks — causal ordering of events; detecting concurrent writes in distributed stores
+- `[ ]` CRDTs — conflict-free merge (G-Counter, LWW-Register, OR-Set); used in Redis, Riak, collaborative editing
+- `[ ]` Raft consensus — leader election, log replication, term numbers; understand the guarantees, don't implement
+- `[ ]` Gossip protocol — epidemic dissemination; failure detection; used in Cassandra, Consul
+- `[ ]` Consistent hashing — virtual nodes, token ring; minimal rehashing when nodes join/leave
+
+### Database Internals
+- `[ ]` B-tree — page structure, internal vs leaf nodes, fill factor, why random inserts cause fragmentation
+- `[ ]` LSM tree — write-optimized (memtable → SSTable → compaction); used in RocksDB, Cassandra, InfluxDB
+- `[ ]` Write-Ahead Log (WAL) — fsync guarantee, crash recovery, log sequence numbers
+- `[ ]` MVCC — multi-version concurrency control; snapshot isolation without read locks; version chain in Postgres
+- `[ ]` VACUUM / AUTOVACUUM — dead tuple reclamation, table bloat, aggressive settings for write-heavy tables
+- `[ ]` Index deep dive — B-tree, Hash (equality only), GIN (arrays/JSONB/full-text), GiST (ranges/geometry), BRIN (large sorted tables), covering (INCLUDE)
+- `[ ]` Partitioning — range, hash, list; partition pruning; local vs global indexes; when sharding vs partitioning
+- `[ ]` Replication — physical (WAL shipping) vs logical (row-level); replica lag monitoring; read replicas as cache
+- `[ ]` Sharding — hash vs range shard key; cross-shard queries; resharding without downtime (consistent hashing)
+- `[ ]` Query optimizer — statistics (pg_stats), cost model, join order, EXPLAIN ANALYZE reading (rows, cost, width)
+- `[ ]` Connection pooling at scale — PgBouncer transaction mode; why app-level pooling isn't enough above ~1k conns
+
+### NoSQL & Specialized Stores
+- `[ ]` Redis deep — persistence (RDB snapshots vs AOF), Sentinel (HA), Cluster (sharding), Lua scripting, pub/sub
+- `[ ]` Redis distributed lock — SET NX EX pattern; Redlock algorithm trade-offs (clock drift problem)
+- `[ ]` Redis as cache vs queue vs pub-sub — strengths and failure modes of each use
+- `[ ]` Elasticsearch / OpenSearch — inverted index, shards + replicas, query (scored) vs filter (cached), aggregations, mapping types
+- `[ ]` Document databases (MongoDB) — embedded vs reference pattern; atomic ops at document level; eventual consistency trade-offs
+- `[ ]` Time-series databases (TimescaleDB / InfluxDB) — hypertables, retention policies, continuous aggregates, downsampling
+- `[ ]` Graph databases (Neo4j) — property graph model, Cypher query basics; when relationships are the query
+
+### Cloud Platforms
+- `[ ]` Azure core — App Service, AKS, Azure SQL, Blob Storage, Service Bus, Key Vault, Managed Identity, Front Door
+- `[ ]` AWS core — EC2, ECS/EKS, RDS, S3, SQS/SNS, Secrets Manager, IAM roles/policies
+- `[ ]` Infrastructure as Code — Terraform (provider/resource/state/modules) or Bicep (Azure-native HCL-like)
+- `[ ]` Serverless — Azure Functions / AWS Lambda; cold start, execution time limits, event triggers, stateless constraints
+- `[ ]` Cloud networking — VNet/VPC, subnets, NSG / Security Groups, Private Endpoints, peering
+- `[ ]` Managed Identity — no secrets in config; app authenticates as Azure AD service principal; RBAC scope
+- `[ ]` CDN + WAF — Azure Front Door / CloudFront; cache rules, custom domains, WAF rule sets, DDoS protection
+- `[ ]` Cost optimization — reserved instances, spot/preemptible, autoscaling triggers, right-sizing tooling
+
+### Advanced Security
+- `[ ]` Threat modeling — STRIDE: Spoofing, Tampering, Repudiation, Info Disclosure, Denial of Service, Elevation of Privilege
+- `[ ]` mTLS — mutual TLS; client certificate authentication; service-to-service in zero-trust networks
+- `[ ]` Supply chain security — SBOM (Software Bill of Materials), signed NuGet packages, Dependabot, license scanning
+- `[ ]` Zero trust architecture — never trust the network; verify every request; micro-segmentation; least privilege
+- `[ ]` Cryptography fundamentals — AES-256 (symmetric), RSA/ECC (asymmetric), SHA-256 (hashing), PBKDF2/Argon2 (passwords), HMAC
+- `[ ]` Secrets rotation — automated rotation, zero-downtime key rotation (dual-key pattern, grace period)
+- `[ ]` Audit logging — tamper-evident storage, structured fields (actor, action, resource, result, timestamp)
+- `[ ]` OWASP Dependency Check / Snyk — automated CVE scanning in CI; severity thresholds as build gates
+
+### Advanced Testing
+- `[ ]` Test pyramid vs test trophy — ratio trade-offs; what each shape optimizes for (speed vs confidence)
+- `[ ]` TDD — Red-Green-Refactor cycle; where it shines (domain logic), where it struggles (I/O-heavy code)
+- `[ ]` BDD — Given-When-Then; Reqnroll (.NET) for living documentation tied to acceptance criteria
+- `[ ]` Property-based testing — FsCheck (.NET) / fast-check (TS); generate arbitrary inputs to find edge cases automatically
+- `[ ]` Mutation testing — Stryker.NET; mutants reveal tests that pass without asserting anything meaningful
+- `[ ]` Contract testing — Pact; consumer-driven contracts; prevent API breakage between producer/consumer services
+- `[ ]` Load testing — k6 / NBomber; VU scripts, ramp-up shape, steady state, interpreting p50/p95/p99/p999
+- `[ ]` Chaos engineering — Simmy (Polly chaos extension); deliberately inject failures to verify resilience paths work
+
 ---
 
 ## AI INTEGRATION
@@ -414,6 +513,26 @@ Update this file after every study session. Be honest.
 - `[~]` Few-shot prompting
 - `[ ]` System prompt design
 - `[ ]` Output format control (JSON mode)
+
+### Semantic Kernel (.NET)
+- `[ ]` Kernel setup — plugins, connectors, AI service registration
+- `[ ]` Native functions — C# methods exposed as AI-callable tools (`[KernelFunction]`)
+- `[ ]` Prompt functions — text templates with `{{$input}}` variables
+- `[ ]` Memory + Embeddings — `ISemanticTextMemory`, `IMemoryStore`, similarity search
+- `[ ]` Planner — auto-invokes plugins to fulfill a goal (Handlebars planner)
+- `[ ]` Filters — `IFunctionInvocationFilter` for logging, safety checks, cost guards
+
+### LLM Evaluation
+- `[ ]` RAGAS metrics — context recall, context precision, faithfulness, answer relevancy
+- `[ ]` Evals as unit tests — deterministic evals for critical RAG flows; test data sets
+- `[ ]` Hallucination detection — self-consistency checks, source attribution, grounding
+- `[ ]` Latency vs quality trade-offs — smaller models for routing, larger for generation
+
+### AI Safety & Guardrails
+- `[ ]` Prompt injection — direct (user input) vs indirect (retrieved content); defense patterns
+- `[ ]` Input/output validation — reject harmful queries before sending to LLM
+- `[ ]` Cost management — token counting, prompt caching (Anthropic/OpenAI), model routing by task complexity
+- `[ ]` Responsible AI principles — transparency, fairness, accountability, human oversight
 
 ---
 
@@ -485,6 +604,17 @@ Update this file after every study session. Be honest.
 - `[ ]` ArrayPool<T> — renting buffers
 - `[ ]` String interning and StringBuilder
 - `[ ]` WeakReference
+
+### C# Performance & Diagnostics
+- `[ ]` BenchmarkDotNet — `[Benchmark]`, `[MemoryDiagnoser]`; reading Mean, Allocated, Gen0/1/2 columns
+- `[ ]` dotTrace CPU — Timeline vs Sampling mode; identifying hot paths, lock contention, GC pauses
+- `[ ]` dotMemory — heap snapshots, retained vs shallow size, finding memory leaks via dominators view
+- `[ ]` PerfView — GC events, CPU stacks, allocation sampling; production-safe because it's event-based
+- `[ ]` Expression trees — `Expression<Func<T,bool>>`; build + compile lambdas at runtime; how EF Core uses them
+- `[ ]` Source generators — `IIncrementalGenerator`, reading syntax trees, emitting code at compile time
+- `[ ]` `System.IO.Pipelines` — `PipeReader`/`PipeWriter`, backpressure, memory reuse, zero-copy parsing
+- `[ ]` Native AOT (.NET 8+) — no JIT, trim analysis, startup + size wins; what breaks (reflection, dynamic types)
+- `[ ]` `IMemoryOwner<T>` / `MemoryPool<T>` — renting memory, returning it; avoiding GC pressure in hot paths
 
 ### TypeScript / JavaScript
 - `[c]` Types, interfaces, generics
@@ -560,6 +690,14 @@ Update this file after every study session. Be honest.
 - `[ ]` ValidationProblemDetails shape
 - `[ ]` .NET Aspire — cloud-native orchestration: service discovery, telemetry, resource wiring, local dev dashboard
 
+### Blazor
+- `[ ]` Blazor Server vs WASM vs Hybrid — rendering model, latency, bundle size trade-offs
+- `[ ]` Component model — `@code`, parameters, cascading values, `EventCallback`
+- `[ ]` Data binding — one-way (`@value`) vs two-way (`@bind`)
+- `[ ]` Lifecycle hooks — `OnInitializedAsync`, `OnParametersSetAsync`, `StateHasChanged`
+- `[ ]` JS interop — `IJSRuntime`; calling JS from C# and C# from JS
+- `[ ]` When Blazor over React — internal tools, .NET-only teams, sharing domain logic between UI and API
+
 ### React
 - `[c]` JSX, components, props
 - `[c]` useState, useEffect, useRef
@@ -617,3 +755,39 @@ Update this file after every study session. Be honest.
 - `[ ]` Route Handlers (API routes in App Router)
 - `[ ]` Middleware — auth checks, redirects
 - `[ ]` Next.js vs Vite + React — when to choose which
+
+### Web Platform APIs
+- `[ ]` Service Workers — install/activate/fetch lifecycle; cache-first vs network-first vs stale-while-revalidate
+- `[ ]` PWA — `manifest.json`, install prompt, push notifications, background sync; what makes a site installable
+- `[ ]` IndexedDB — client-side structured storage; Dexie.js as ergonomic wrapper
+- `[ ]` WebSockets — full-duplex; when vs SSE (server-push only) vs long-polling
+- `[ ]` Web Workers — CPU work off main thread; `Comlink` for structured API over `postMessage`
+- `[ ]` Intersection Observer — lazy loading images, infinite scroll, analytics visibility tracking
+- `[ ]` Core Web Vitals — LCP (largest paint), CLS (layout shift), INP (interaction delay); what hurts each metric
+- `[ ]` Web performance tooling — Lighthouse CI, Chrome DevTools Performance tab, WebPageTest waterfall
+
+### CSS Architecture
+- `[ ]` Cascade, specificity, inheritance — three mechanisms; why `!important` is a code smell
+- `[ ]` Flexbox — main axis, cross axis, `flex-grow`/`shrink`/`basis`; common one-liner centering patterns
+- `[ ]` CSS Grid — template areas, auto-placement, subgrid; when Grid over Flexbox
+- `[ ]` CSS custom properties — theming system, scoped variables, JS interop via `getPropertyValue`
+- `[ ]` CSS Modules — scoped class names, `composes` keyword, zero runtime
+- `[ ]` Tailwind CSS — utility-first, purging, arbitrary values `[]`, responsive `sm:`/`md:` prefixes, dark mode
+- `[ ]` BEM naming — block__element--modifier; when useful, when it fights the component model
+- `[ ]` Responsive design — media queries, container queries (`@container`), fluid typography (`clamp()`)
+- `[ ]` CSS animations — transitions vs `@keyframes` vs Web Animations API vs Framer Motion; choosing the right tool
+
+### Accessibility (a11y)
+- `[ ]` WCAG 2.1 / 2.2 — A / AA / AAA levels; AA is the legal minimum in most jurisdictions
+- `[ ]` Semantic HTML — landmark regions (`main`, `nav`, `aside`), heading hierarchy, `<button>` vs `<div>`
+- `[ ]` ARIA roles and attributes — `aria-label`, `aria-describedby`, `role`; when to add vs when semantic HTML is enough
+- `[ ]` Keyboard navigation — focus order (`tabindex`), focus traps in modals, skip-to-content links
+- `[ ]` Screen reader testing — NVDA + Chrome (Windows), VoiceOver + Safari (Mac/iOS) — basic smoke testing
+- `[ ]` Color contrast — 4.5:1 for normal text, 3:1 for large text; tools: axe DevTools, Colour Contrast Analyser
+
+### Internationalization (i18n)
+- `[ ]` react-i18next — `useTranslation`, namespaces, `Trans` component for JSX content with markup
+- `[ ]` ICU message format — `{count, plural, one{# item} other{# items}}`; select for gender/variants
+- `[ ]` RTL support — `dir="rtl"` on `<html>`; CSS logical properties (`margin-inline-start` vs `margin-left`)
+- `[ ]` `Intl` API — `Intl.DateTimeFormat`, `Intl.NumberFormat`, `Intl.RelativeTimeFormat`; browser-native, no library needed
+- `[ ]` Locale detection — `Accept-Language` header, URL prefix (`/en/`, `/bg/`), cookie persistence strategy

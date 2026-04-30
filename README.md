@@ -28,11 +28,11 @@ swe-knowledge/
 
 | Folder | Who needs it | Examples |
 |---|---|---|
-| `junior/` | Before or at first job | HTTP/REST, Git, SQL basics, Big-O, algorithms, clean code, agile |
-| `mid/` | 1-3 years or targeting remote SWE | DDD, CQRS, Clean Architecture, EF Core, event-driven design, auth, testing |
-| `senior/` | 3+ years or targeting senior/lead | System design, microservices, Kubernetes, observability, caching at scale |
-| `my-stack/` | Alongside any level | C#, ASP.NET Core, TypeScript, React, Redux, React Native, Next.js |
-| `ai-integration/` | When adding AI features | LLM API calls, RAG pipelines, agentic patterns, prompt engineering |
+| `junior/` | Before or at first job | HTTP/REST, Git, SQL basics, Big-O, algorithms, clean code, agile, CS fundamentals |
+| `mid/` | 1-3 years or targeting remote SWE | DDD, CQRS, Clean Architecture, EF Core, event-driven design, auth, Event Sourcing, Hexagonal, VSA |
+| `senior/` | 3+ years or targeting senior/lead | Distributed systems theory, database internals, NoSQL, cloud platforms, advanced security, chaos engineering |
+| `my-stack/` | Alongside any level | C#, ASP.NET Core, TypeScript, React, Redux, Blazor, React Native, Next.js, CSS, a11y |
+| `ai-integration/` | When adding AI features | LLM API calls, RAG pipelines, agentic patterns, Semantic Kernel, LLM evaluation |
 
 ---
 
@@ -43,7 +43,7 @@ swe-knowledge/
 |---|---|
 | `algorithms.md` | Sorting, searching, two pointers, sliding window, recursion |
 | `big-o.md` | Time/space complexity, best/average/worst case |
-| `browser-internals.md` | DNS → TCP → render pipeline, reflow vs repaint |
+| `browser-internals.md` | DNS → TCP → render pipeline, reflow vs repaint, Core Web Vitals |
 | `clean-code.md` | Naming, guard clauses, DRY/YAGNI/KISS, code smells |
 | `data-structures.md` | Arrays, linked lists, stacks, queues, trees, hash maps |
 | `git.md` | Branching, rebase vs merge, PR workflow, reflog, bisect |
@@ -77,6 +77,7 @@ swe-knowledge/
 | `sql-advanced.md` | CTEs, indexes, execution plans, deadlocks, connection pooling |
 | `docker.md` | Dockerfile, docker-compose, multi-stage builds, networking |
 | `behavioral.md` | STAR method, core stories, project walkthrough, "tell me about yourself" |
+| `architecture-patterns.md` | Event Sourcing, Hexagonal Architecture, Vertical Slice Architecture, Context Mapping, ADRs |
 
 ### senior/
 | File | What it covers |
@@ -90,6 +91,8 @@ swe-knowledge/
 | `ci-cd.md` | GitHub Actions, Docker build, blue/green deployment, secrets |
 | `kubernetes.md` | Pod/Deployment/Service, probes, rolling updates, ConfigMap |
 | `advanced-algorithms.md` | Dijkstra, topological sort, dynamic programming, backtracking |
+| `distributed-systems.md` | CAP theorem, eventual consistency, CRDTs, Raft consensus, consistent hashing |
+| `database-internals.md` | B-tree, WAL, MVCC, partitioning, replication, sharding, Redis deep, Elasticsearch |
 
 ### my-stack/
 | File | Level | What it covers |
@@ -101,6 +104,7 @@ swe-knowledge/
 | `csharp-background-jobs.md` | Mid | IHostedService, BackgroundService, Channel<T>, Hangfire |
 | `csharp-concurrency.md` | Mid → Senior | lock, SemaphoreSlim, async pitfalls, CancellationToken |
 | `csharp-memory.md` | Senior | GC generations, boxing, Span<T>, ArrayPool |
+| `csharp-performance.md` | Senior | BenchmarkDotNet, dotTrace, dotMemory, expression trees, source generators, Native AOT |
 | `aspnet.md` | Mid | Controllers, middleware, filters, DI lifetimes, minimal APIs |
 | `typescript-js.md` | Junior → Mid | Closures, event loop, Promises, prototype chain |
 | `typescript-advanced.md` | Mid | Utility types, discriminated unions, mapped types, infer |
@@ -112,6 +116,11 @@ swe-knowledge/
 | `zustand.md` | Mid | create(), useShallow, persist, Zustand vs Redux |
 | `react-native.md` | Mid (beginner) | Core components, navigation, WatermelonDB, StyleSheet |
 | `nextjs.md` | Mid | SSR/SSG/ISR, App Router, Server Components, middleware |
+| `blazor.md` | Mid | Blazor Server vs WASM vs Hybrid, component model, JS interop |
+| `web-platform.md` | Mid → Senior | Service Workers, PWA, IndexedDB, Web Workers, Core Web Vitals |
+| `css-architecture.md` | Mid | Flexbox, Grid, CSS Modules, Tailwind, BEM, responsive design, animations |
+| `accessibility.md` | Mid | WCAG 2.1, semantic HTML, ARIA, keyboard navigation, screen readers |
+| `i18n.md` | Mid | react-i18next, ICU format, RTL, Intl API, locale detection |
 
 ### ai-integration/
 | File | What it covers |
@@ -120,6 +129,8 @@ swe-knowledge/
 | `rag.md` | Chunking, embeddings, vector stores, retrieval pipeline |
 | `agentic-patterns.md` | Tool use, prompt chaining, reflection, multi-agent |
 | `prompt-engineering.md` | Chain-of-thought, few-shot, COSTAR, output format control |
+| `semantic-kernel.md` | Semantic Kernel for .NET — plugins, planners, memory, filters |
+| `llm-evaluation.md` | RAGAS metrics, evals as unit tests, hallucination detection |
 
 ---
 
