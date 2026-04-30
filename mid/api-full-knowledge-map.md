@@ -457,6 +457,416 @@ public class OrdersApiTests : IClassFixture<WebApplicationFactory<Program>>
 
 ---
 
+## IHttpClientFactory + Polly
+
+Never `new HttpClient()` — it exhausts sockets. Use `IHttpClientFactory`.
+
+```csharp
+// Typed client — cleanest approach
+public class StripeClient : IStripeClient
+{
+    private readonly HttpClient _client;
+    public StripeClient(HttpClient client) => _client = client;
+    public Task<ChargeResult> ChargeAsync(ChargeRequest req, CancellationToken ct)
+        => _client.PostAsJsonAsync<ChargeResult>("/v1/charges", req, ct);
+}
+
+// Registration with Polly resilience pipeline
+builder.Services.AddHttpClient<IStripeClient, StripeClient>(client =>
+{
+    client.BaseAddress = new Uri(config["Stripe:BaseUrl"]!);
+    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {config["Stripe:ApiKey"]}");
+})
+.AddPolicyHandler(Policy<HttpResponseMessage>
+    .Handle<HttpRequestException>()
+    .OrResult(r => !r.IsSuccessStatusCode)
+    .WaitAndRetryAsync(3, attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt))))
+.AddPolicyHandler(Policy<HttpResponseMessage>
+    .Handle<HttpRequestException>()
+    .CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+```
+
+`IHttpClientFactory` manages a pool of `HttpMessageHandler` instances — clients are reused correctly, DNS changes are respected, no socket exhaustion.
+
+---
+
+## IAsyncEnumerable — Streaming Large Responses
+
+When a query returns thousands of rows, don't buffer all into memory first. Stream directly to the client.
+
+```csharp
+// Query handler — yields rows as they come from DB
+public async IAsyncEnumerable<OrderSummaryDto> Handle(
+    StreamOrdersQuery query,
+    [EnumeratorCancellation] CancellationToken ct)
+{
+    await foreach (var order in _context.Orders
+        .AsNoTracking()
+        .Where(o => o.CreatedAt >= query.From)
+        .Select(o => new OrderSummaryDto(o.Id, o.Status, o.TotalAmount))
+        .AsAsyncEnumerable()
+        .WithCancellation(ct))
+    {
+        yield return order;
+    }
+}
+
+// Controller — ASP.NET Core serializes the stream as a JSON array
+[HttpGet("orders/stream")]
+public IAsyncEnumerable<OrderSummaryDto> StreamOrders([FromQuery] StreamOrdersQuery query, CancellationToken ct)
+    => _mediator.CreateStream(query, ct);
+// MediatR IStreamRequestHandler + IAsyncEnumerable — same pattern
+```
+
+Memory stays flat regardless of result set size. Client receives rows as they arrive.
+
+---
+
+## 202 Accepted — Long-Running Operations
+
+For operations that take more than a few seconds: accept immediately, return a job ID, let client poll.
+
+```csharp
+// 1. Controller accepts immediately
+[HttpPost("reports/generate")]
+public async Task<IActionResult> GenerateReport([FromBody] GenerateReportRequest request)
+{
+    var jobId = await _mediator.Send(new QueueReportJobCommand(request));
+    return Accepted(new { jobId, statusUrl = $"/api/v1/reports/jobs/{jobId}" });
+    // HTTP 202 — "I received your request, working on it"
+}
+
+// 2. Client polls the status endpoint
+[HttpGet("reports/jobs/{jobId}")]
+public async Task<IActionResult> GetJobStatus(Guid jobId)
+{
+    var job = await _mediator.Send(new GetJobStatusQuery(jobId));
+    return job.Status switch
+    {
+        JobStatus.Pending    => Accepted(job),           // 202 — still running
+        JobStatus.Completed  => Ok(job),                 // 200 — result ready
+        JobStatus.Failed     => UnprocessableEntity(job) // 422 — failed with reason
+    };
+}
+```
+
+---
+
+## Webhooks — Sending and Receiving
+
+**Sending webhooks** (your API notifies external systems):
+```csharp
+public class WebhookDispatcher : IWebhookDispatcher
+{
+    private readonly IHttpClientFactory _factory;
+
+    public async Task SendAsync(string url, object payload, string secret, CancellationToken ct)
+    {
+        var json = JsonSerializer.Serialize(payload);
+        var signature = ComputeHmac(json, secret); // HMAC-SHA256
+
+        var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-Webhook-Signature", signature);
+        await client.PostAsJsonAsync(url, payload, ct);
+    }
+
+    private static string ComputeHmac(string payload, string secret)
+    {
+        var key = Encoding.UTF8.GetBytes(secret);
+        var data = Encoding.UTF8.GetBytes(payload);
+        var hash = HMACSHA256.HashData(key, data);
+        return Convert.ToHexString(hash).ToLower();
+    }
+}
+```
+
+**Receiving webhooks** (external systems notify you — e.g. Stripe):
+```csharp
+[HttpPost("webhooks/stripe")]
+public async Task<IActionResult> StripeWebhook()
+{
+    // 1. Read raw body — must read before model binding
+    var json = await new StreamReader(Request.Body).ReadToEndAsync();
+
+    // 2. Verify signature — reject if tampered
+    var signature = Request.Headers["Stripe-Signature"].ToString();
+    if (!VerifyStripeSignature(json, signature, _config["Stripe:WebhookSecret"]))
+        return Unauthorized();
+
+    // 3. Process event
+    var stripeEvent = JsonSerializer.Deserialize<StripeEvent>(json);
+    await _mediator.Send(new HandleStripeEventCommand(stripeEvent));
+
+    return Ok(); // always return 200 — Stripe retries on non-2xx
+}
+```
+
+---
+
+## PATCH vs PUT Semantics
+
+| Method | Semantics | Use when |
+|---|---|---|
+| **PUT** | Replace entire resource | Client sends full object |
+| **PATCH** | Partial update — only fields provided | Client sends only changed fields |
+
+```csharp
+// PUT — replace whole order
+[HttpPut("orders/{id}")]
+public Task<IActionResult> UpdateOrder(Guid id, [FromBody] UpdateOrderRequest request)
+
+// PATCH — update only the shipping address
+[HttpPatch("orders/{id}/shipping")]
+public Task<IActionResult> UpdateShipping(Guid id, [FromBody] UpdateShippingRequest request)
+// Only contains the fields allowed to change — mapper ignores null/missing fields
+```
+
+**JSON Patch** (`Microsoft.AspNetCore.JsonPatch`) is the RFC standard for PATCH but adds complexity. For most APIs, a simple partial-update DTO is enough.
+
+---
+
+## System.Text.Json Configuration
+
+```csharp
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()); // enum as string
+    options.SerializerOptions.WriteIndented = false; // production: compact JSON
+});
+
+// IMPORTANT: Never create JsonSerializerOptions per-request
+// ✅ Register once as singleton or use the static options
+// ❌ new JsonSerializerOptions() in a loop = memory/perf problem
+private static readonly JsonSerializerOptions _options = new()
+{
+    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+};
+```
+
+---
+
+## Feature Flags
+
+Control feature availability without deployment — gradual rollout, A/B testing, kill switch.
+
+```csharp
+// NuGet: Microsoft.FeatureManagement.AspNetCore
+builder.Services.AddFeatureManagement();
+
+// appsettings.json
+{
+  "FeatureManagement": {
+    "NewCheckoutFlow": true,
+    "ExperimentalSearch": false
+  }
+}
+
+// In a controller or handler
+public class CheckoutController : ControllerBase
+{
+    private readonly IFeatureManager _features;
+
+    [HttpPost("checkout")]
+    public async Task<IActionResult> Checkout([FromBody] CheckoutRequest request)
+    {
+        if (await _features.IsEnabledAsync("NewCheckoutFlow"))
+            return await NewCheckout(request);
+        return await LegacyCheckout(request);
+    }
+}
+
+// Filter — gate entire controller action
+[FeatureGate("NewCheckoutFlow")]
+[HttpPost("checkout/new")]
+public IActionResult NewCheckout() { }
+```
+
+---
+
+## OWASP API Security Top 10
+
+Different from OWASP Web Top 10 — specific to APIs.
+
+| # | Vulnerability | Prevention |
+|---|---|---|
+| **API1** | Broken Object Level Authorization (BOLA) | Always verify `userId == resource.OwnerId` — never trust client-supplied IDs alone |
+| **API2** | Broken Authentication | Short-lived tokens, PKCE, rotate refresh tokens |
+| **API3** | Broken Object Property Level Auth | Never expose fields user shouldn't see — use DTOs, not entities |
+| **API4** | Unrestricted Resource Consumption | Rate limiting, pagination limits, file size limits |
+| **API5** | Broken Function Level Authorization | Separate admin endpoints, check roles explicitly |
+| **API6** | Unrestricted Access to Sensitive Business Flows | Rate limit checkout, OTP, password reset |
+| **API7** | Server-Side Request Forgery (SSRF) | Validate/whitelist URLs before fetching external resources |
+| **API8** | Security Misconfiguration | Disable Swagger in prod, check default credentials, CORS policy |
+| **API9** | Improper Inventory Management | Version your API, deprecate old versions, track all endpoints |
+| **API10** | Unsafe Consumption of APIs | Validate/sanitize responses from third-party APIs before using |
+
+**API1 (BOLA) is the most common API vulnerability.** Always check ownership:
+```csharp
+// ❌ Wrong — trusts the route ID without checking ownership
+var order = await _repo.GetByIdAsync(orderId);
+return Ok(order);
+
+// ✅ Correct — verifies the order belongs to the calling user
+var userId = User.GetUserId();
+var order = await _repo.GetByIdAsync(orderId);
+if (order.UserId != userId) return Forbid();
+return Ok(order);
+```
+
+---
+
+## Minimal APIs
+
+Lighter alternative to controllers — no class required, just route handlers.
+
+```csharp
+// Program.cs or a separate file via extension method
+app.MapGet("/api/v1/orders/{id}", async (
+    Guid id,
+    IMediator mediator,
+    CancellationToken ct) =>
+{
+    var result = await mediator.Send(new GetOrderByIdQuery(id), ct);
+    return result is null ? Results.NotFound() : Results.Ok(result);
+})
+.WithName("GetOrder")
+.RequireAuthorization()
+.Produces<OrderDto>()
+.ProducesProblem(StatusCodes.Status404NotFound);
+
+// IEndpointFilter — equivalent of action filters for Minimal APIs
+app.MapPost("/api/v1/orders", HandlePlaceOrder)
+   .AddEndpointFilter<ValidationFilter<PlaceOrderRequest>>();
+```
+
+When to choose Minimal APIs over Controllers:
+- Simple CRUD modules with few cross-cutting concerns
+- Microservices with small surface area
+- Performance-critical paths (slightly less overhead)
+
+---
+
+## Content Negotiation + Model Binding
+
+**Content negotiation** — client tells server what format it wants:
+```
+Accept: application/json          ← I want JSON back
+Accept: application/xml           ← I want XML back
+Content-Type: application/json    ← I'm sending JSON
+```
+
+ASP.NET Core handles this automatically when you add XML formatters. Default is JSON only.
+
+**Model binding sources** — be explicit:
+```csharp
+public IActionResult CreateOrder(
+    [FromRoute] Guid customerId,     // from /api/customers/{customerId}/orders
+    [FromQuery] string? referral,    // from ?referral=abc
+    [FromBody] CreateOrderRequest request,  // from request body (JSON)
+    [FromHeader(Name = "X-Source")] string? source) // from header
+```
+
+Rule: one `[FromBody]` per action. Everything else uses `[FromRoute]`/`[FromQuery]`/`[FromHeader]`.
+
+---
+
+## ValidationProblemDetails vs ProblemDetails
+
+Two different error shapes — know which to return when.
+
+```
+ProblemDetails              ← generic error (auth failure, not found, conflict)
+{
+  "type": "https://tools.ietf.org/html/rfc7807",
+  "title": "Not Found",
+  "status": 404,
+  "detail": "Order abc not found"
+}
+
+ValidationProblemDetails    ← validation errors (400 Bad Request from FluentValidation)
+{
+  "type": "https://tools.ietf.org/html/rfc7807",
+  "title": "One or more validation errors occurred.",
+  "status": 400,
+  "errors": {
+    "Quantity": ["Quantity must be greater than 0"],
+    "ProductId": ["ProductId is required"]
+  }
+}
+```
+
+```csharp
+// Return ValidationProblemDetails manually
+return ValidationProblem(new ValidationProblemDetails(ModelState));
+
+// FluentValidation + ValidationFilter returns this shape automatically
+```
+
+---
+
+## Multi-Tenancy Strategies
+
+| Strategy | How tenant is identified | When to use |
+|---|---|---|
+| **Header** | `X-Tenant-Id: tenant123` | Internal APIs, B2B |
+| **JWT claim** | `tenantId` claim in the token | Most common — auth already required |
+| **Subdomain** | `tenant123.yourapp.com` | SaaS with white-labelling |
+| **Path** | `/tenant123/api/orders` | Least common |
+
+**Implementation with Global Query Filter:**
+```csharp
+// Infrastructure: resolve current tenant
+public interface ITenantContext { Guid TenantId { get; } }
+
+public class JwtTenantContext : ITenantContext
+{
+    private readonly IHttpContextAccessor _accessor;
+    public Guid TenantId =>
+        Guid.Parse(_accessor.HttpContext!.User.FindFirstValue("tenantId")!);
+}
+
+// DbContext: filter every query
+public class OrdersDbContext : DbContext
+{
+    private readonly ITenantContext _tenant;
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        builder.Entity<Order>()
+            .HasQueryFilter(o => o.TenantId == _tenant.TenantId);
+        // all Order queries automatically scoped to current tenant
+    }
+}
+```
+
+---
+
+## Connection Pooling
+
+Two layers — both managed automatically but worth understanding:
+
+**SQL Server connection pool** (ADO.NET level):
+- Connections are reused, not closed/opened per request
+- Default pool size: 100 connections
+- `Min Pool Size`, `Max Pool Size` in connection string
+- Exhausted pool → `TimeoutException` after 30s
+
+**DbContext pooling** (EF Core level):
+- Reuse `DbContext` instances across requests — expensive to create
+- ```csharp
+  services.AddDbContextPool<OrdersDbContext>(opts => ..., poolSize: 128);
+  ```
+- Resets state between uses — don't store request-level data on the context
+
+```csharp
+// Connection string options
+"Server=localhost;Database=ECommerce;Min Pool Size=5;Max Pool Size=100;Connection Timeout=30"
+```
+
+---
+
 ## Graceful Shutdown
 
 ```csharp
@@ -508,10 +918,11 @@ API Knowledge
 │   ├── Role-based + policy-based authorization [ ]
 │   ├── PKCE + refresh token rotation           [ ]
 │   ├── CORS, CSRF, XSS, security headers       [b] (security-depth.md)
+│   ├── OWASP API Security Top 10               [ ]
 │   └── Rate limiting (built-in + Redis)        [ ]
 │
 ├── Middleware Pipeline
-│   ├── Correct order (exception → HTTPS → CORS → rate → auth → authz → compress → route)
+│   ├── Correct 9-step order                    [ ]
 │   ├── Custom middleware (IMiddleware)          [b]
 │   └── Short-circuit patterns                  [ ]
 │
@@ -520,6 +931,11 @@ API Knowledge
 │   ├── Pagination + PagedResult<T>             [ ]
 │   ├── Filtering + sorting on list endpoints   [ ]
 │   ├── Idempotency keys on POST                [ ]
+│   ├── 202 Accepted + job polling pattern      [ ]
+│   ├── PATCH vs PUT semantics                  [ ]
+│   ├── Webhooks — send + receive + HMAC        [ ]
+│   ├── Content negotiation + model binding     [ ]
+│   ├── ValidationProblemDetails vs ProblemDetails [ ]
 │   └── Swagger / OpenAPI documentation        [ ]
 │
 ├── Caching
@@ -527,6 +943,10 @@ API Knowledge
 │   ├── IDistributedCache → Redis               [b] (system design)
 │   ├── Output caching (.NET 8)                 [ ]
 │   └── ETag + Cache-Control                    [ ]
+│
+├── HTTP Clients
+│   ├── IHttpClientFactory — typed + named      [ ]
+│   └── Polly + IHttpClientFactory              [ ]
 │
 ├── File Handling
 │   ├── IFormFile upload → IBlobService         [ ]
@@ -536,8 +956,11 @@ API Knowledge
 │   ├── SignalR (bi-directional)                [ ]
 │   └── SSE (server push only)                  [ ]
 │
+├── Streaming
+│   └── IAsyncEnumerable<T> large responses     [ ]
+│
 ├── Background Work
-│   ├── BackgroundService                        [b] (OutboxDispatcher)
+│   ├── BackgroundService                        [b]
 │   ├── Channel<T> (in-process queue)           [ ]
 │   └── Hangfire (persistent scheduled jobs)    [ ]
 │
@@ -545,6 +968,26 @@ API Knowledge
 │   ├── Options pattern (IOptions variants)     [ ]
 │   ├── ValidateOnStart — fail fast             [ ]
 │   └── Secrets management                      [ ]
+│
+├── DI Advanced
+│   ├── Keyed services (.NET 8)                 [ ]
+│   ├── Decorator pattern (Scrutor)             [ ]
+│   └── DateTime vs DateTimeOffset              [ ]
+│
+├── Multi-Tenancy
+│   ├── Tenant resolution strategies            [ ]
+│   └── Global Query Filter per tenant          [ ]
+│
+├── Feature Flags
+│   └── Microsoft.FeatureManagement             [ ]
+│
+├── Minimal APIs
+│   ├── Route handlers vs controllers           [ ]
+│   └── IEndpointFilter                         [ ]
+│
+├── Performance
+│   ├── System.Text.Json options                [ ]
+│   └── Connection + DbContext pooling          [ ]
 │
 ├── Testing
 │   ├── Unit (xUnit + Moq)                      [b]
@@ -586,3 +1029,20 @@ API Knowledge
 - `[ ]` ValidateOnStart
 - `[ ]` Graceful shutdown + HostOptions
 - `[ ]` Response compression
+- `[ ]` IHttpClientFactory — typed + named clients
+- `[ ]` Polly + IHttpClientFactory wiring
+- `[ ]` IAsyncEnumerable<T> streaming responses
+- `[ ]` 202 Accepted + job polling pattern
+- `[ ]` Webhooks — send + receive + HMAC signature
+- `[ ]` PATCH vs PUT semantics
+- `[ ]` System.Text.Json configuration options
+- `[ ]` Feature flags — Microsoft.FeatureManagement
+- `[ ]` OWASP API Security Top 10
+- `[ ]` Minimal APIs + IEndpointFilter
+- `[ ]` Content negotiation + model binding sources
+- `[ ]` ValidationProblemDetails vs ProblemDetails
+- `[ ]` Multi-tenancy strategies + Global Query Filter
+- `[ ]` Connection pooling + DbContext pooling
+- `[ ]` Keyed services (.NET 8)
+- `[ ]` Decorator pattern in DI (Scrutor)
+- `[ ]` DateTime vs DateTimeOffset

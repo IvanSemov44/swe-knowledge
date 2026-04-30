@@ -42,6 +42,9 @@ Orchestrates use cases. No business logic. No framework references except Mediat
 | **Request models** | Input shapes — `CreateOrderRequest`, validated at API boundary |
 | **DTOs** | Output shapes — `OrderDto`, `OrderSummaryDto` — never expose domain entities |
 | **FluentValidation validators** | `AbstractValidator<PlaceOrderCommand>` — business-rule-free input validation |
+| **Cross-field validators** | `.Must((cmd, val) => ...)` / `RuleFor(x => x).Custom(...)` — validate two fields together |
+| **Async validators** | `MustAsync(async (val, ct) => await _repo.ExistsAsync(val))` — DB checks in validators |
+| **`ValidationProblemDetails`** | Standard shape for validation 400: `{ errors: { "field": ["message"] } }` — different from `ProblemDetails` |
 
 ### Interfaces (contracts for Infrastructure)
 | What | Purpose |
@@ -95,12 +98,18 @@ Framework-dependent. Implements interfaces from Domain/Application.
 | **Interceptors** | `SaveChangesInterceptor` — set `UpdatedAt`, dispatch domain events (alternative to override) |
 | **Migrations** | One migration project per DbContext, separate schema per module |
 | **Bulk operations** | `ExecuteUpdateAsync` / `ExecuteDeleteAsync` — bypass change tracker, no entity load |
+| **Connection resilience** | `EnableRetryOnFailure()` — EF automatically retries transient DB errors (network blip, deadlock) |
+| **Raw SQL** | `FromSqlRaw` / `ExecuteSqlRawAsync` — for when LINQ produces poor SQL or for stored procs |
+| **Zero-downtime migrations** | Expand-contract: add nullable column first → deploy → backfill → make NOT NULL → deploy again |
+| **Multi-tenancy via Global Query Filter** | `modelBuilder.Entity<Order>().HasQueryFilter(o => o.TenantId == _tenantId)` — auto-scopes every query |
 
 ### Repositories & UoW
 | What | Purpose |
 |---|---|
 | **Repository implementation** | Implements `IOrderRepository`, touches only this BC's DbContext |
 | **Unit of Work implementation** | Wraps `DbContext.SaveChangesAsync()`, exposes repositories |
+| **Specification pattern** | Encapsulates complex query logic as an object — `ISpecification<T>` passed into repository |
+| **Dapper alongside EF** | Raw SQL for performance-critical reads where LINQ produces bad SQL — EF for writes, Dapper for hot queries |
 
 ### Messaging
 | What | Purpose |
@@ -119,7 +128,10 @@ Framework-dependent. Implements interfaces from Domain/Application.
 | What | Purpose |
 |---|---|
 | **EmailService, BlobService, etc.** | Implement interfaces from Application layer |
-| **HttpClient + Polly** | Resilient outbound HTTP — retry, circuit breaker, timeout |
+| **`IHttpClientFactory`** | Manages `HttpClient` lifetimes — avoids socket exhaustion from creating clients per-request |
+| **Named clients** | `services.AddHttpClient("stripe", c => c.BaseAddress = ...)` — named per external service |
+| **Typed clients** | `services.AddHttpClient<IStripeClient, StripeClient>()` — strongly typed, inject directly |
+| **Polly + `IHttpClientFactory`** | `.AddPolicyHandler(retryPolicy)` on `AddHttpClient` — retry/circuit breaker built into the client |
 
 ### Module registration
 | What | Purpose |
@@ -152,7 +164,10 @@ Thin. No business logic. No domain knowledge.
 |---|---|
 | **Dependency Injection lifetimes** | Singleton / Scoped / Transient — captive dependency trap (Singleton → Scoped = bug) |
 | **`IServiceScopeFactory`** | Create a Scoped lifetime inside a Singleton (BackgroundService → DbContext) |
+| **Keyed services (.NET 8)** | `services.AddKeyedScoped<IPayment, StripePayment>("stripe")` — multiple implementations of same interface, resolved by key |
+| **Decorator pattern in DI** | Wrap a service with cross-cutting behaviour without touching the original class — `services.Decorate<IOrderRepository, CachingOrderRepository>()` (Scrutor) |
 | **Cancellation tokens** | Every async method: `CancellationToken ct = default` — propagate, never ignore |
+| **`DateTime` vs `DateTimeOffset`** | Always use `DateTimeOffset` for timestamps — includes timezone offset, no ambiguity across regions |
 | **Correlation ID** | Trace a request across all log entries — middleware generates once, flows through |
 | **Structured logging (Serilog)** | JSON logs with typed properties — not `Console.WriteLine` |
 | **Health checks** | `/health/live` (process alive) + `/health/ready` (DB + broker reachable) |

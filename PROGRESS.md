@@ -521,6 +521,29 @@ Update this file after every study session. Be honest.
 - `[ ]` Role-based + policy-based authorization
 - `[ ]` Options pattern — IOptions vs IOptionsSnapshot vs IOptionsMonitor
 - `[ ]` ValidateOnStart — fail fast on bad config
+- `[ ]` IHttpClientFactory — typed + named clients, socket exhaustion
+- `[ ]` Polly + IHttpClientFactory wiring
+- `[ ]` IAsyncEnumerable<T> streaming large responses
+- `[ ]` 202 Accepted + job polling pattern (long-running ops)
+- `[ ]` Webhooks — send + receive + HMAC signature verification
+- `[ ]` PATCH vs PUT semantics
+- `[ ]` System.Text.Json configuration options
+- `[ ]` Feature flags — Microsoft.FeatureManagement
+- `[ ]` OWASP API Security Top 10 (different from OWASP Web Top 10)
+- `[ ]` Minimal APIs + IEndpointFilter
+- `[ ]` Content negotiation + model binding sources
+- `[ ]` ValidationProblemDetails vs ProblemDetails
+- `[ ]` Multi-tenancy strategies + Global Query Filter
+- `[ ]` Connection pooling + DbContext pooling
+- `[ ]` Keyed services (.NET 8)
+- `[ ]` Decorator pattern in DI (Scrutor)
+- `[ ]` DateTime vs DateTimeOffset
+- `[ ]` Specification pattern (complex query encapsulation)
+- `[ ]` Dapper alongside EF (performance-critical reads)
+- `[ ]` EF connection resilience — EnableRetryOnFailure
+- `[ ]` Zero-downtime migrations — expand-contract pattern
+- `[ ]` Cross-field + async FluentValidation
+- `[ ]` ValidationProblemDetails shape
 
 ### React
 - `[c]` JSX, components, props
