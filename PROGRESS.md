@@ -327,12 +327,40 @@ Update this file after every study session. Be honest.
 - `[ ]` Core stories prepared — conflict, failure, leadership, influence without authority, tight deadline
 - `[ ]` "Tell me about yourself" pitch — 90-second version, tailored per company type
 - `[ ]` Technical project walkthrough — architecture decisions, trade-offs, what you'd do differently
-- `[ ]` Salary negotiation — anchoring, ranges, total comp (equity, bonus), offer timing
-- `[ ]` Asking good interview questions — questions that reveal culture, tech debt, team health
+- `[ ]` Salary negotiation — never give number first, counter with specific number, full package (base + equity + PTO + learning budget)
+- `[ ]` Asking good interview questions — questions that reveal culture, tech debt, team health, red flags
 - `[ ]` Remote work best practices — async communication, visibility, documentation culture
 - `[ ]` Engineering communication — writing clear Slack/PR/email messages; async vs sync choices
 - `[ ]` Receiving feedback — not getting defensive; separating code critique from personal critique
 - `[ ]` Giving feedback — code review tone, "I notice" vs "you should", asking questions vs demanding
+
+### Interview Prep — Junior Level
+- `[ ]` Junior interview format — what each round tests, what "coachable and collaborative" looks like to them
+- `[ ]` Junior question bank — OOP, DI, async basics, HTTP verbs, SQL joins, Git branching
+- `[ ]` Easy LeetCode patterns — Two Sum (hash map), valid parentheses (stack), palindrome, frequency count
+- `[ ]` Junior take-home checklist — working app > perfect architecture, README, frequent commits, no unexplained tech
+
+### Interview Prep — Mid Level
+- `[ ]` Mid interview format — 4 rounds (recruiter, coding, component design, behavioral); what each tests
+- `[ ]` Live coding 6-step framework — Understand → Clarify → Examples → Approach → Code → Test
+- `[ ]` When stuck strategies — thinking out loud, brute force first, ask for hints without going silent
+- `[ ]` Mid question bank — middleware pipeline, EF change tracker, Domain vs Integration events, Outbox, CancellationToken, captive dependency
+- `[ ]` React question bank — re-render triggers, useEffect rules, controlled vs uncontrolled, RTK Query vs Zustand
+- `[ ]` Component design questions — shopping cart, caching layer, notification service, file upload
+- `[ ]` Take-home best practices — README with decisions, tests, clean git history, 4-8 hour signal, .env.example
+
+### Interview Prep — Senior Level
+- `[ ]` Senior interview format — coding + system design ×2 + leadership behavioral; ambiguity handling is core
+- `[ ]` System design framework — clarify → estimate → API → data model → high-level → deep dive → trade-offs
+- `[ ]` System design topics — URL shortener, rate limiter, notification service, chat, feed, file storage
+- `[ ]` Senior question bank — CAP in financial systems, exactly-once processing, zero-downtime migrations, 10× traffic
+- `[ ]` Leadership behavioral prep — influence without authority, technical debt under pressure, handling a production incident
+
+### Interview Readiness
+- `[ ]` Company research checklist done before each interview (stack, culture, stage, salary range, interviewer LinkedIn)
+- `[ ]` Red flags recognition — "no time for tests", "we're like a family", all engineers < 1 year, exploding offers
+- `[ ]` Interview timeline — 4-week prep plan (CV → LeetCode → stories → mock → company research)
+- `[ ]` Mock interview completed — live coding out loud, recorded or with a partner
 
 ### Testing
 - `[b]` Unit testing with xUnit

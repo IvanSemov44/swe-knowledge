@@ -76,7 +76,8 @@ swe-knowledge/
 | `rtk-query.md` | injectEndpoints, cache tags, optimistic updates |
 | `sql-advanced.md` | CTEs, indexes, execution plans, deadlocks, connection pooling |
 | `docker.md` | Dockerfile, docker-compose, multi-stage builds, networking |
-| `behavioral.md` | STAR method, core stories, project walkthrough, "tell me about yourself" |
+| `behavioral.md` | STAR method, core stories, project walkthrough, conflict, remote work answers |
+| `interview-prep.md` | Interview formats by level, live coding strategy, system design framework, question banks, company research, red flags, salary negotiation |
 | `architecture-patterns.md` | Event Sourcing, Hexagonal Architecture, Vertical Slice Architecture, Context Mapping, ADRs |
 
 ### senior/
