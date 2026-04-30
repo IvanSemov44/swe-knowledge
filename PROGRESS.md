@@ -162,6 +162,7 @@ Update this file after every study session. Be honest.
 - `[c]` Dependency rule
 - `[b]` Interfaces at boundaries
 - `[b]` Use case pattern
+- `[b]` Full BC knowledge map — every pattern, library, layer
 
 ### DDD
 - `[b]` Entities vs Value Objects
