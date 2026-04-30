@@ -163,6 +163,7 @@ Update this file after every study session. Be honest.
 - `[b]` Interfaces at boundaries
 - `[b]` Use case pattern
 - `[b]` Full BC knowledge map — every pattern, library, layer
+- `[ ]` Vertical Slice Architecture — organize by feature not layer; compare trade-offs vs Clean Architecture
 
 ### DDD
 - `[b]` Entities vs Value Objects
@@ -428,6 +429,14 @@ Update this file after every study session. Be honest.
 - `[~]` Span<T>, Memory<T>
 - `[ ]` Source generators
 
+### C# Modern Syntax (C# 12+ / .NET 8+)
+- `[ ]` Primary constructors — `class Foo(IService svc)` — used in services, handlers, repos daily
+- `[ ]` Collection expressions — `[1, 2, 3]` for arrays, lists, spans; spread operator `..`
+- `[ ]` `using` declarations — `using var x = ...` — scoped disposal without nested block
+- `[ ]` `TimeProvider` (.NET 8) — abstraction over `DateTime.UtcNow`; inject in services, use `FakeTimeProvider` in tests
+- `[ ]` `FrozenDictionary` / `FrozenSet` (.NET 8) — immutable, faster lookup; use for static lookup data
+- `[ ]` `required` members (C# 11) — `required string Name { get; init; }` — compiler-enforced initialization
+
 ### C# Nullable Reference Types
 - `[ ]` Nullable value types — int?, HasValue
 - `[ ]` Nullable reference types — #nullable enable, compiler tracking
@@ -485,6 +494,8 @@ Update this file after every study session. Be honest.
 - `[b]` Hoisting
 - `[~]` Currying, partial application
 - `[~]` Prototype chain
+- `[ ]` Promise.all vs allSettled vs race vs any — when each is right
+- `[ ]` `using` declarations (TS 5.2 / ES2025) — `await using conn = ...` — explicit resource management
 
 ### TypeScript Advanced Types
 - `[ ]` Utility types (Partial, Required, Pick, Omit, Record, Exclude, Extract, NonNullable, ReturnType)
@@ -505,11 +516,14 @@ Update this file after every study session. Be honest.
 - `[b]` Configuration (appsettings, environment)
 - `[~]` Minimal APIs
 - `[ ]` SignalR
+- `[ ]` OpenAPI / Swagger — `Microsoft.AspNetCore.OpenApi` (.NET 9 built-in, no Swashbuckle), document endpoints, describe errors
+- `[ ]` Middleware vs Filter vs IEndpointFilter — the decision matrix (scope: all requests vs post-routing vs per-endpoint)
 - `[ ]` API versioning (Asp.Versioning.Http)
 - `[ ]` Pagination — PagedResult<T>, offset vs keyset
 - `[ ]` Rate limiting — built-in .NET 8 + Redis distributed
 - `[ ]` Output caching — .NET 8 built-in
 - `[ ]` IMemoryCache + IDistributedCache usage pattern
+- `[ ]` HybridCache (.NET 9) — one API for local + distributed tier, stampede protection, replaces IMemoryCache + IDistributedCache boilerplate
 - `[ ]` ETag + Cache-Control headers
 - `[ ]` Idempotency key filter pattern
 - `[ ]` IFormFile upload + FileStreamResult download
@@ -544,6 +558,7 @@ Update this file after every study session. Be honest.
 - `[ ]` Zero-downtime migrations — expand-contract pattern
 - `[ ]` Cross-field + async FluentValidation
 - `[ ]` ValidationProblemDetails shape
+- `[ ]` .NET Aspire — cloud-native orchestration: service discovery, telemetry, resource wiring, local dev dashboard
 
 ### React
 - `[c]` JSX, components, props
@@ -553,6 +568,13 @@ Update this file after every study session. Be honest.
 - `[b]` React Router
 - `[b]` Forms (controlled vs uncontrolled)
 - `[~]` Performance (memo, lazy, Suspense)
+
+### React 19
+- `[ ]` React Compiler — auto-memoizes; when manual `memo`/`useMemo`/`useCallback` is still needed
+- `[ ]` `use()` hook — reads promises and context; replaces some `useEffect` data-fetch patterns
+- `[ ]` `useOptimistic` — built-in optimistic updates (was experimental in React 18)
+- `[ ]` `useActionState` — form state + async action in one hook; replaces most `useState` form boilerplate
+- `[ ]` Server Actions (Next.js / React 19) — form submissions directly to server functions
 
 ### React Performance
 - `[ ]` When React re-renders — the four triggers
@@ -578,16 +600,6 @@ Update this file after every study session. Be honest.
 - `[ ]` Typing Context — undefined default + custom hook
 - `[ ]` Generic components
 - `[ ]` forwardRef typing
-
-### TypeScript / JavaScript
-- `[c]` Types, interfaces, generics
-- `[c]` async/await, Promises
-- `[b]` Closures
-- `[b]` Event loop, call stack, microtask queue
-- `[b]` Hoisting
-- `[~]` Currying, partial application
-- `[~]` Prototype chain
-- `[ ]` Promise.all vs allSettled vs race vs any
 
 ### React Native
 - `[b]` Core components (View, Text, ScrollView, FlatList)
