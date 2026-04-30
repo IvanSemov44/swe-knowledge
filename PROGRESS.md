@@ -49,7 +49,9 @@ Update this file after every study session. Be honest.
 - `[b]` Idempotency
 - `[b]` API versioning strategies
 - `[ ]` HTTP/2 — multiplexing, header compression
+- `[ ]` HTTP/3 / QUIC — UDP-based, 0-RTT connection, connection migration; why it matters for mobile
 - `[ ]` WebSockets vs SSE vs long polling — when each
+- `[ ]` WebRTC basics — peer-to-peer media; ICE/STUN/TURN; when you need it (video calls, live collab)
 
 ### SQL Basics
 - `[c]` SELECT, WHERE, ORDER BY, GROUP BY
@@ -138,6 +140,7 @@ Update this file after every study session. Be honest.
 - `[~]` HTTPS, TLS basics
 - `[b]` OWASP top 10
 - `[ ]` PKCE — how it works, why SPAs need it
+- `[ ]` OpenID Connect (OIDC) — identity layer on top of OAuth2; `id_token` vs `access_token`; `/.well-known/openid-configuration`
 - `[ ]` HttpOnly + Secure + SameSite cookie attributes
 - `[ ]` Session-based vs token-based auth — trade-offs
 - `[ ]` CORS — preflight, headers, ASP.NET Core setup
@@ -297,6 +300,8 @@ Update this file after every study session. Be honest.
 - `[ ]` Offset vs cursor/keyset pagination — trade-offs
 - `[ ]` GraphQL — query model, N+1, when over REST
 - `[ ]` gRPC — Protobuf, streaming, when over REST
+- `[ ]` gRPC in .NET — `Grpc.AspNetCore`, `.proto` file generation, `GrpcChannel` client, streaming RPCs
+- `[ ]` GraphQL in .NET — HotChocolate server; schema-first vs code-first; `IQueryable` integration
 - `[ ]` Idempotency keys for POST endpoints
 
 ### SQL Advanced
@@ -308,11 +313,26 @@ Update this file after every study session. Be honest.
 - `[ ]` Deadlocks — causes and prevention
 - `[ ]` Connection pooling + DbContext lifetime
 
-### Behavioral
-- `[ ]` STAR method
-- `[ ]` Core stories prepared
-- `[ ]` "Tell me about yourself" pitch
-- `[ ]` Technical project walkthrough
+### SQL Server (Ivan's Stack)
+- `[ ]` Query Store — tracks execution plan history; find plan regressions without a profiler
+- `[ ]` Temporal Tables — system-versioned history; `FOR SYSTEM_TIME AS OF` queries; audit + time-travel
+- `[ ]` Always Encrypted — column-level encryption; keys never leave client; EF Core provider support
+- `[ ]` SQL Server Profiler / Extended Events — lightweight production tracing; replace Profiler with XEvents
+- `[ ]` Database snapshots — point-in-time copy for reporting without blocking; no transaction log needed
+- `[ ]` NOLOCK hint — risks (dirty reads, phantom reads); when acceptable; better alternatives (Read Committed Snapshot)
+- `[ ]` Columnstore indexes — analytical workloads; batch mode execution; 10× compression typical
+
+### Behavioral & Career
+- `[ ]` STAR method — Situation, Task, Action, Result; practicing with your actual projects
+- `[ ]` Core stories prepared — conflict, failure, leadership, influence without authority, tight deadline
+- `[ ]` "Tell me about yourself" pitch — 90-second version, tailored per company type
+- `[ ]` Technical project walkthrough — architecture decisions, trade-offs, what you'd do differently
+- `[ ]` Salary negotiation — anchoring, ranges, total comp (equity, bonus), offer timing
+- `[ ]` Asking good interview questions — questions that reveal culture, tech debt, team health
+- `[ ]` Remote work best practices — async communication, visibility, documentation culture
+- `[ ]` Engineering communication — writing clear Slack/PR/email messages; async vs sync choices
+- `[ ]` Receiving feedback — not getting defensive; separating code critique from personal critique
+- `[ ]` Giving feedback — code review tone, "I notice" vs "you should", asking questions vs demanding
 
 ### Testing
 - `[b]` Unit testing with xUnit
@@ -480,6 +500,20 @@ Update this file after every study session. Be honest.
 - `[ ]` Secrets rotation — automated rotation, zero-downtime key rotation (dual-key pattern, grace period)
 - `[ ]` Audit logging — tamper-evident storage, structured fields (actor, action, resource, result, timestamp)
 - `[ ]` OWASP Dependency Check / Snyk — automated CVE scanning in CI; severity thresholds as build gates
+
+### Professional Engineering Practices
+- `[ ]` SLI / SLO / SLA — Service Level Indicators (what you measure), Objectives (targets), Agreements (contracts); error budget = 1 - SLO
+- `[ ]` Error budgets — how much unreliability is allowed; when to ship vs when to focus on reliability
+- `[ ]` DORA metrics — Deployment Frequency, Lead Time for Changes, Change Failure Rate, MTTR; measuring team health
+- `[ ]` Incident response — severity levels, incident commander role, war room protocol, communication cadence
+- `[ ]` Postmortems — blameless format; timeline, root cause, contributing factors, action items; systemic fixes over blame
+- `[ ]` Runbooks — step-by-step operational procedures; written when calm, used when panicked
+- `[ ]` On-call hygiene — alert fatigue, actionable alerts only, escalation paths, toil reduction
+- `[ ]` Technical writing — design docs (problem/proposal/alternatives/trade-offs), RFCs, one-pagers
+- `[ ]` Code review culture — review the code not the person; review for correctness + maintainability + learning
+- `[ ]` Estimation — T-shirt sizing, Fibonacci story points, why estimates ≠ commitments; cone of uncertainty
+- `[ ]` Technical debt — classifying (reckless vs prudent vs deliberate vs inadvertent), tracking, paying it down strategically
+- `[ ]` Open source contribution — finding good first issues, PR etiquette, maintaining a contribution, building reputation
 
 ### Advanced Testing
 - `[ ]` Test pyramid vs test trophy — ratio trade-offs; what each shape optimizes for (speed vs confidence)
@@ -860,3 +894,18 @@ Update this file after every study session. Be honest.
 - `[ ]` RTL support — `dir="rtl"` on `<html>`; CSS logical properties (`margin-inline-start` vs `margin-left`)
 - `[ ]` `Intl` API — `Intl.DateTimeFormat`, `Intl.NumberFormat`, `Intl.RelativeTimeFormat`; browser-native, no library needed
 - `[ ]` Locale detection — `Accept-Language` header, URL prefix (`/en/`, `/bg/`), cookie persistence strategy
+
+### Developer Tooling & Workflow
+- `[ ]` Monorepos — Turborepo (task graph, remote cache) vs Nx (generators, affected commands); when vs polyrepo
+- `[ ]` npm workspaces / pnpm workspaces — shared node_modules, inter-package dependencies
+- `[ ]` ESLint config — `flat config` (v9+), rule severity, plugin ecosystem, `@typescript-eslint`, `eslint-plugin-react`
+- `[ ]` Prettier — opinionated formatter; `.prettierrc`; integrating with ESLint (no conflicts)
+- `[ ]` Husky + lint-staged — pre-commit hooks that only lint staged files; fast CI-equivalent checks locally
+- `[ ]` Conventional Commits — `feat:`, `fix:`, `chore:`, `BREAKING CHANGE:`; machine-readable changelog
+- `[ ]` Semantic versioning — MAJOR.MINOR.PATCH; when to bump each; `semantic-release` for automation
+- `[ ]` `.env` management — `dotenv`, `dotenv-vault`, Zod for runtime env validation (`z.object({ PORT: z.coerce.number() })`)
+- `[ ]` Build tools landscape — Vite (dev + build), esbuild (speed), Rollup (libraries), Webpack (legacy); when each
+- `[ ]` Debugging in VSCode — launch configs, breakpoints, conditional breakpoints, logpoints, attach to Node/browser
+- `[ ]` Debugging .NET in Rider/VSCode — remote debug, hot reload, exception settings, memory dumps
+- `[ ]` Chrome DevTools mastery — Network waterfall, Performance flame graph, Memory heap snapshot, Sources breakpoints
+- `[ ]` AI-assisted development — Copilot in editor, Cursor agentic edits, when to trust vs when to verify output
