@@ -184,17 +184,29 @@ public async Task Handle_WhenQuantityIsInvalid_ShouldReturnCorrectError(
 | `IAsyncLifetime` | Async setup/teardown via `InitializeAsync` / `DisposeAsync` |
 
 ### Testing Domain Entities (No Mocks Needed)
+
+Domain entity tests are pure C#. No mocks, no DI, no database. Create the object, call the method, check result + state + events.
+
+**Pattern for every domain method:**
+```
+Happy path  → result succeeds + state changed + event raised (if applicable)
+Failure path → result fails + correct ErrorCode + state UNCHANGED + no event raised
+```
+
 ```csharp
 public class OrderTests
 {
     [Fact]
     public void AddItem_WhenOrderIsPending_ShouldAddItem()
     {
+        // Arrange
         var order = Order.Create(Guid.NewGuid(), someAddress);
         var product = Product.Create("Sneakers", Money.Of(89.99m, "USD"), stock: 10);
 
+        // Act
         var result = order.AddItem(product, quantity: 2);
 
+        // Assert
         result.IsSuccess.Should().BeTrue();
         order.Items.Should().HaveCount(1);
         order.Items.First().Quantity.Should().Be(2);
@@ -203,16 +215,87 @@ public class OrderTests
     [Fact]
     public void AddItem_WhenOrderIsNotPending_ShouldFail()
     {
+        // Arrange
         var order = Order.Create(Guid.NewGuid(), someAddress);
-        order.Place(); // transition to Placed status
+        order.Place();
 
+        // Act
         var result = order.AddItem(someProduct, 1);
 
+        // Assert
         result.IsSuccess.Should().BeFalse();
         result.ErrorCode.Should().Be(ErrorCodes.InvalidOrderStatus);
+        order.Items.Should().BeEmpty(); // state unchanged
     }
 }
 ```
+
+### Testing Domain Events on Entities
+
+Domain events live on the entity in `AggregateRoot.DomainEvents`. No mocks needed — just read the collection.
+
+```csharp
+// AggregateRoot base (for reference)
+public abstract class AggregateRoot : Entity
+{
+    private readonly List<IDomainEvent> _domainEvents = new();
+    public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+    protected void RaiseDomainEvent(IDomainEvent e) => _domainEvents.Add(e);
+}
+```
+
+```csharp
+public class OrderPlaceTests
+{
+    [Fact]
+    public void Place_WhenOrderIsPending_ShouldTransitionToPlaced()
+    {
+        // Arrange
+        var order = Order.Create(Guid.NewGuid(), someAddress);
+
+        // Act
+        var result = order.Place();
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        order.Status.Should().Be(OrderStatus.Placed);
+    }
+
+    [Fact]
+    public void Place_WhenOrderIsAlreadyPlaced_ShouldReturnFailure()
+    {
+        // Arrange
+        var order = Order.Create(Guid.NewGuid(), someAddress);
+        order.Place(); // first placement — gets into wrong state
+
+        // Act
+        var result = order.Place(); // second placement should fail
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.ErrorCode.Should().Be(ErrorCodes.InvalidOrderStatus);
+        order.Status.Should().Be(OrderStatus.Placed); // state unchanged
+    }
+
+    [Fact]
+    public void Place_WhenOrderIsPending_ShouldRaiseOrderPlacedDomainEvent()
+    {
+        // Arrange
+        var order = Order.Create(Guid.NewGuid(), someAddress);
+
+        // Act
+        order.Place();
+
+        // Assert — check existence AND content
+        order.DomainEvents.Should().ContainSingle();
+        var domainEvent = order.DomainEvents.First()
+            .Should().BeOfType<OrderPlacedDomainEvent>().Subject;
+        domainEvent.OrderId.Should().Be(order.Id);
+    }
+}
+```
+
+**Two-part event assertion rule:** Always check that the event exists AND that it contains the right data. `ContainSingle()` alone is not enough.
 
 ---
 
@@ -390,15 +473,19 @@ order.Should().BeEquivalentTo(expected, opts => opts.Excluding(o => o.CreatedAt)
 
 ## Test Doubles — Mock vs Stub vs Spy vs Fake vs Dummy
 
-These terms are often used interchangeably in conversation ("just mock it"), but they mean different things. Interviews test whether you know the distinctions.
+A **test double** is any object that stands in for a real dependency in a test. There are five types. Interviews test whether you know the distinctions — everyone says "mock" but most people can't explain the difference.
 
-| Double | What it does | When to use |
+| Double | What it does | Moq equivalent |
 |---|---|---|
-| **Dummy** | Passed around but never used. Fills a required parameter. | Constructor parameters you don't care about in this test |
-| **Stub** | Returns a pre-configured answer to calls. No verification. | When you need to control what a dependency returns |
-| **Mock** | Verifies that specific calls were made with specific arguments. | When the test cares THAT something was called (not just what it returned) |
-| **Spy** | A real object that records what was called. Verify after. | When you want real behavior but also want to assert calls |
-| **Fake** | A working implementation, simpler than production. | In-memory repository, in-memory queue |
+| **Dummy** | Passed in but never used. Fills a required parameter. | `new Mock<T>().Object` with no setup |
+| **Stub** | Returns a pre-configured value. No verification. | `.Setup(...).ReturnsAsync(...)` |
+| **Mock** | Verifies that a specific call was made. | `.Verify(...)` |
+| **Spy** | A real object that also records what was called. | `Mock` with `CallBase = true` |
+| **Fake** | A real working implementation, simpler than production. | `InMemoryOrderRepository : IOrderRepository` |
+
+**Decision rule:**
+- Use a **Stub** when the outcome of the test is the **return value**
+- Use a **Mock** when the outcome of the test is **whether something was called**
 
 ```csharp
 // STUB — control what the dependency returns, don't verify calls
