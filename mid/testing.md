@@ -26,6 +26,33 @@ Without tests, every change is a risk. With good tests, you can refactor fearles
 
 ---
 
+## Choosing the Right Test Type
+
+Ask one question before writing any test:
+
+> **"What external systems does this behavior require to exist?"**
+
+| Code | External systems needed | Test type |
+|---|---|---|
+| `Order.AddItem()` rejects wrong status | None — pure domain logic | Unit (no mocks) |
+| `CreateOrderCommandHandler` | `IUnitOfWork` — mockable interface | Unit (Moq) |
+| `POST /api/orders` → DB → response | Full HTTP stack + real database | Integration |
+| Full user checkout flow | Everything | E2E (rare) |
+
+**The rule:**
+- If you can replace a dependency with a fake interface → **unit test with Moq**
+- If you need real SQL behavior (constraints, migrations, transactions) → **integration test with TestContainers**
+
+**In your e-commerce project:**
+```
+Order.AddItem()                    → Unit (pure domain logic, no mocks)
+CreateOrderCommandHandler          → Unit (mock IUnitOfWork)
+POST /api/orders → DB → response   → Integration (TestContainers)
+Full checkout flow                 → E2E (rarely written)
+```
+
+---
+
 ## Unit Testing with xUnit + Moq
 
 ### Setup
@@ -36,16 +63,18 @@ dotnet add package Moq
 dotnet add package FluentAssertions
 ```
 
-### Basic Test Structure (AAA Pattern)
+### AAA Pattern — Arrange / Act / Assert
+
+Every test has exactly three sections separated by a blank line. This is non-negotiable.
+
 ```csharp
 public class CreateOrderCommandHandlerTests
 {
-    private readonly Mock<IUnitOfWork> _uowMock;
+    private readonly Mock<IUnitOfWork> _uowMock = new();
     private readonly CreateOrderCommandHandler _handler;
 
     public CreateOrderCommandHandlerTests()
     {
-        _uowMock = new Mock<IUnitOfWork>();
         _handler = new CreateOrderCommandHandler(_uowMock.Object);
     }
 
@@ -59,7 +88,6 @@ public class CreateOrderCommandHandlerTests
             ProductId: product.Id,
             Quantity: 2,
             ShippingAddress: new Address("123 Main St", "Sofia", "BG"));
-
         _uowMock.Setup(u => u.Products.GetByIdAsync(product.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(product);
         _uowMock.Setup(u => u.CommitAsync(It.IsAny<CancellationToken>()))
@@ -79,10 +107,9 @@ public class CreateOrderCommandHandlerTests
     public async Task Handle_WhenProductNotFound_ShouldReturnFailure()
     {
         // Arrange
-        var command = new CreateOrderCommand(Guid.NewGuid(), Guid.NewGuid(), 1, someAddress);
-
         _uowMock.Setup(u => u.Products.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((Product?)null);
+        var command = new CreateOrderCommand(Guid.NewGuid(), Guid.NewGuid(), 1, someAddress);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -92,17 +119,69 @@ public class CreateOrderCommandHandlerTests
         result.ErrorCode.Should().Be(ErrorCodes.ProductNotFound);
         _uowMock.Verify(u => u.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
-
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    [InlineData(-100)]
-    public async Task Handle_WhenQuantityInvalid_ShouldReturnFailure(int quantity)
-    {
-        // ... test edge cases
-    }
 }
 ```
+
+### [Fact] vs [Theory]
+
+`[Fact]` = one test, one scenario.
+`[Theory]` = one test, multiple data sets — xUnit runs it once per row.
+
+Use `[Theory]` when the same rule must hold across multiple inputs, especially invalid/edge cases.
+
+```csharp
+// [InlineData] — for primitive inputs
+[Theory]
+[InlineData(0)]
+[InlineData(-1)]
+[InlineData(-999)]
+public async Task Handle_WhenQuantityIsInvalid_ShouldReturnFailure(int quantity)
+{
+    // Arrange
+    var command = new CreateOrderCommand(Guid.NewGuid(), Guid.NewGuid(), quantity, someAddress);
+
+    // Act
+    var result = await _handler.Handle(command, CancellationToken.None);
+
+    // Assert
+    result.IsSuccess.Should().BeFalse();
+    result.ErrorCode.Should().Be(ErrorCodes.InvalidQuantity);
+}
+
+// [MemberData] — when inputs are complex or you want to vary the expected outcome too
+public static IEnumerable<object[]> InvalidQuantities => new[]
+{
+    new object[] { 0,     ErrorCodes.InvalidQuantity },
+    new object[] { -1,    ErrorCodes.InvalidQuantity },
+    new object[] { 9999,  ErrorCodes.ExceedsStockLimit },
+};
+
+[Theory]
+[MemberData(nameof(InvalidQuantities))]
+public async Task Handle_WhenQuantityIsInvalid_ShouldReturnCorrectError(
+    int quantity, string expectedError)
+{
+    // Arrange
+    var command = new CreateOrderCommand(Guid.NewGuid(), Guid.NewGuid(), quantity, someAddress);
+
+    // Act
+    var result = await _handler.Handle(command, CancellationToken.None);
+
+    // Assert
+    result.IsSuccess.Should().BeFalse();
+    result.ErrorCode.Should().Be(expectedError);
+}
+```
+
+### xUnit Attributes Cheat Sheet
+
+| Attribute | Use |
+|---|---|
+| `[Fact]` | Single scenario |
+| `[Theory]` + `[InlineData]` | Multiple primitive inputs |
+| `[Theory]` + `[MemberData]` | Multiple complex inputs or varied expected outcomes |
+| `IClassFixture<T>` | Shared setup across all tests in one class (e.g., shared DB container) |
+| `IAsyncLifetime` | Async setup/teardown via `InitializeAsync` / `DisposeAsync` |
 
 ### Testing Domain Entities (No Mocks Needed)
 ```csharp
@@ -139,19 +218,26 @@ public class OrderTests
 
 ## What to Test (and What Not To)
 
-### Test:
-- Domain entity business logic (invariants, state transitions)
-- Command handlers (business workflow, error cases)
-- Domain services
-- Validators (FluentValidation)
-- Mapping logic (if complex)
+**The rule:** Unit test your logic. Integration test your configuration.
 
-### Don't Test:
-- Framework code (DI registration, EF Core itself)
-- Simple CRUD with no business logic
-- Third-party library behavior
+| Code | Test type | Why |
+|---|---|---|
+| `Order.AddItem()`, `Order.Place()` | Unit | Pure domain logic, no deps |
+| `Money.Add()`, value object equality | Unit | Pure logic |
+| `CreateOrderCommandHandler` | Unit | Logic, deps are mockable |
+| FluentValidation rules | Unit | Logic, fast |
+| `ProductRepository.GetByIdAsync()` | None / Integration | Delegates entirely to EF Core |
+| Global query filters (`!p.IsDeleted`) | Integration | Only activates against real DB |
+| EF Core mappings / migrations | Integration | Requires real SQL engine |
+| Controllers (thin) | None | No logic to test |
+| DI registration | None | Framework concern |
+
+**Never test:**
+- Private methods directly — test through the public API that calls them
+- Third-party library behavior (EF Core, MediatR internals)
 - Auto-generated code
-- Private methods directly (test through public API)
+
+**Key insight on repositories:** If `GetByIdAsync` is `return await _context.Products.FindAsync(id)`, there is no logic — don't unit test it. BUT if you have a global query filter like `HasQueryFilter(p => !p.IsDeleted)`, that filter only activates against a real DB. A mocked context won't catch whether the filter is applied. That's integration test territory.
 
 **Rule of thumb:** Test behavior, not implementation details. Tests should survive refactoring.
 

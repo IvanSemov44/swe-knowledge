@@ -286,12 +286,20 @@ Update this file after every study session. Be honest.
 - `[ ]` Technical project walkthrough
 
 ### Testing
-- `[b]` Unit testing with xUnit
+- `[b]` Test pyramid — choosing unit vs integration vs E2E
+- `[b]` Unit testing with xUnit — [Fact], [Theory], [InlineData], [MemberData]
+- `[b]` AAA pattern — Arrange / Act / Assert
+- `[b]` What to test and what not to test
 - `[b]` Mocking with Moq
 - `[~]` Integration testing with TestContainers
-- `[~]` What to test and what not to test
-- `[ ]` Frontend testing (React Testing Library)
 - `[ ]` Test doubles — Mock vs Stub vs Spy vs Fake vs Dummy
+- `[ ]` Domain entity testing
+- `[ ]` Command handler testing (full coverage)
+- `[ ]` FluentValidation rule testing
+- `[ ]` Test data builders
+- `[ ]` IClassFixture vs CollectionFixture — shared state between tests
+- `[ ]` Database seeding strategies for integration tests
+- `[ ]` Frontend testing (React Testing Library)
 - `[ ]` RTL queries — getBy vs queryBy vs findBy, role-first approach
 - `[ ]` Testing async components with RTL + MSW
 
