@@ -286,8 +286,8 @@ Update this file after every study session. Be honest.
 - `[ ]` Technical project walkthrough
 
 ### Testing
-- `[b]` Unit testing with xUnit
-- `[b]` Mocking with Moq
+- `[~]` Unit testing with xUnit
+- `[~]` Mocking with Moq
 - `[~]` Integration testing with TestContainers
 - `[~]` What to test and what not to test
 - `[ ]` Frontend testing (React Testing Library)

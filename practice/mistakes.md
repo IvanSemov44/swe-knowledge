@@ -151,3 +151,27 @@ This file tracks the exact things that tripped you up — which is what intervie
 **Fix / key insight:** Three must-know: `Content-Security-Policy: default-src 'self'` (kills XSS), `X-Frame-Options: DENY` (prevents clickjacking), `Strict-Transport-Security: max-age=31536000; includeSubDomains` (forces HTTPS).
 **Revisit:** mid/security-depth.md
 **Revisit by:** 2026-05-01
+
+## 2026-05-13
+**Topic:** Testing — `Mock<T>` vs `Mock<T>.Object`
+**What happened:** Said "it's fake what to return, we pass it to control behavior" — right concept, wrong technical detail.
+**Root cause:** Didn't know `_uowMock` and `_uowMock.Object` are two different objects with different types.
+**Fix / key insight:** `_uowMock` is Moq's wrapper — you call `.Setup()` and `.Verify()` on it. `_uowMock.Object` is the generated proxy that implements the interface — this is what you inject into the handler. Handler expects `IUnitOfWork`, not `Mock<IUnitOfWork>`.
+**Revisit:** mid/testing.md
+**Revisit by:** 2026-05-18
+
+## 2026-05-13
+**Topic:** Testing — `[InlineData]` compile-time constants
+**What happened:** Used `string.Empty` and `string.Whitespace` inside `[InlineData]` — both are compile errors.
+**Root cause:** Didn't know attribute arguments must be compile-time constants. `string.Empty` is `static readonly`, not `const`. `string.Whitespace` doesn't exist.
+**Fix / key insight:** Use string literals inside `[InlineData]`: `""` not `string.Empty`, `" "` not `string.Whitespace`.
+**Revisit:** mid/testing.md
+**Revisit by:** 2026-05-18
+
+## 2026-05-13
+**Topic:** Testing — `IClassFixture<T>`
+**What happened:** Blank — no knowledge of what IClassFixture does.
+**Root cause:** Never studied xUnit lifecycle. Topic was `[ ]`.
+**Fix / key insight:** `IClassFixture<T>` creates the fixture once and shares it across all tests in the class. Without it, each test would spin up a new Docker container — extremely slow. xUnit injects the shared instance via the constructor.
+**Revisit:** mid/testing.md
+**Revisit by:** 2026-05-18
