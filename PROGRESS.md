@@ -453,13 +453,13 @@ Update this file after every study session. Be honest.
 
 ### C# Concurrency & Thread Safety
 - `[ ]` Thread vs Task — cost and use cases
-- `[ ]` Race conditions — recognizing and fixing
-- `[ ]` lock / Monitor — rules and limits
-- `[ ]` SemaphoreSlim — async critical sections
-- `[ ]` Interlocked — atomic operations
+- `[~]` Race conditions — recognizing and fixing
+- `[~]` lock / Monitor — rules and limits
+- `[~]` SemaphoreSlim — async critical sections
+- `[~]` Interlocked — atomic operations
 - `[ ]` Thread-safe collections — ConcurrentDictionary gotchas
-- `[ ]` async/await pitfalls — .Result deadlock, async void
-- `[ ]` ConfigureAwait(false) — when needed
+- `[~]` async/await pitfalls — .Result deadlock, async void
+- `[~]` ConfigureAwait(false) — when needed
 - `[ ]` CancellationToken propagation
 
 ### C# Memory Management

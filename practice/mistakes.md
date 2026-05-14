@@ -175,3 +175,11 @@ This file tracks the exact things that tripped you up — which is what intervie
 **Fix / key insight:** `IClassFixture<T>` creates the fixture once and shares it across all tests in the class. Without it, each test would spin up a new Docker container — extremely slow. xUnit injects the shared instance via the constructor.
 **Revisit:** mid/testing.md
 **Revisit by:** 2026-05-18
+
+## 2026-05-14
+**Topic:** C# Concurrency — async/await is not multi-threading
+**What happened:** Said "async is multi-thread" when explaining why lock doesn't work in async code.
+**Root cause:** Confused async/await (I/O efficiency) with multi-threading (parallel CPU work). Two completely different things.
+**Fix / key insight:** async/await frees threads during I/O waits — one thread, reused. Multi-threading runs CPU work in parallel across multiple threads. In ASP.NET Core, almost always async/await. Task.Run is for CPU work only.
+**Revisit:** mid/csharp-concurrency.md
+**Revisit by:** 2026-05-19
